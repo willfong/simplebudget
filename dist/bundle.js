@@ -24032,6 +24032,9 @@ var Spend = React.createClass({
     var lsRef = localStorage.getItem('sbudget');
     if (lsRef) {
       this.state = JSON.parse(lsRef);
+      if (this.state.categories.length === 0) {
+        HashHistory.replace('/settings');
+      }
       this.forceUpdate();
     }
   },
@@ -24503,5 +24506,10 @@ var routes = React.createElement(
 );
 
 ReactDOM.render(routes, document.querySelector('#app'));
+
+var lsRef = localStorage.getItem('sbudget');
+if (lsRef) {
+  HashHistory.replace('/spend');
+}
 
 },{"react":215,"react-dom":2,"react-router":30}]},{},[216]);
