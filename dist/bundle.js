@@ -23995,20 +23995,20 @@ var Home = React.createClass({
           React.createElement(
             'h1',
             null,
-            'Navbar example'
+            'Simple Budget'
           ),
           React.createElement(
             'p',
             null,
-            'This example is a quick exercise to illustrate how the default, static and fixed to top navbar work. It includes the responsive CSS and HTML, so it also adapts to your viewport and device.'
+            'Just want to keep track of how much you spend every month without fuss?'
           ),
           React.createElement(
             'p',
             null,
             React.createElement(
               'a',
-              { className: 'btn btn-lg btn-primary', href: '../../components/#navbar', role: 'button' },
-              'View navbar docs »'
+              { className: 'btn btn-lg btn-primary', href: '#/settings', role: 'button' },
+              'Yeah, thought so...'
             )
           )
         )
@@ -24101,7 +24101,6 @@ var Spend = React.createClass({
 
 var SpendCat = React.createClass({
   displayName: 'SpendCat',
-
 
   formSubmit: function (e) {
     e.preventDefault();
@@ -24369,7 +24368,6 @@ var ReportSummaryLine = React.createClass({
 
 var Settings = React.createClass({
   displayName: 'Settings',
-
 
   getInitialState: function () {
     return {
