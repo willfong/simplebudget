@@ -62,7 +62,7 @@ var Spend = React.createClass({
       categories: [],
       monthlyTotals: {},
       monthlyLog: {}
-    }
+    };
   },
   
   componentDidMount: function() {
@@ -81,7 +81,7 @@ var Spend = React.createClass({
   },
     
   displayCat: function(key) {
-    return <SpendCat key={key} category={key} index={this.state.categories.indexOf(key)} spend={this.spend}/>
+    return <SpendCat key={key} category={key} index={this.state.categories.indexOf(key)} spend={this.spend}/>;
   },
   
   spend: function(category, price) {
@@ -90,9 +90,9 @@ var Spend = React.createClass({
     var monthId = (new Date()).getMonth()+1;
     var dateId;
     if (monthId < 10) {
-      dateId = parseInt(yearId + '0' + monthId);
+      dateId = parseInt(yearId + '0' + monthId, 10);
     } else {
-      dateId = parseInt(yearId + monthId);
+      dateId = parseInt(yearId + monthId, 10);
     }
     
     {/* Need to learn more about Javascript Objects... */}
@@ -105,7 +105,7 @@ var Spend = React.createClass({
       this.state.monthlyTotals[dateId][category] = 0;
     }
     
-    this.state.monthlyTotals[dateId][category] = parseInt(this.state.monthlyTotals[dateId][category]) + parseInt(price);
+    this.state.monthlyTotals[dateId][category] = parseInt(this.state.monthlyTotals[dateId][category], 10) + parseInt(price, 10);
     this.setState({monthlyTotals: this.state.monthlyTotals});
     
     
@@ -165,7 +165,7 @@ var SpendCat = React.createClass({
     </div>
   </div>
 </div>
-    )
+    );
   }
 });
 
@@ -177,7 +177,7 @@ var Reports = React.createClass({
       monthlyTotals: {},
       monthlyLog: {},
       showMonthId: this.getMonthId()
-    }
+    };
   },
   
   componentDidMount: function() {
@@ -199,9 +199,9 @@ var Reports = React.createClass({
     var monthId = (new Date()).getMonth()+1;
     var dateId;
     if (monthId < 10) {
-      dateId = parseInt(yearId + '0' + monthId);
+      dateId = parseInt(yearId + '0' + monthId, 10);
     } else {
-      dateId = parseInt(yearId + monthId);
+      dateId = parseInt(yearId + monthId, 10);
     }
     return dateId;
         
@@ -210,7 +210,7 @@ var Reports = React.createClass({
   deleteMonthlyLog: function(key) {
     var toDelete = this.state.monthlyLog[this.state.showMonthId][key];
     if (confirm('Are you sure you want to delete '+toDelete.category+' ('+toDelete.price+')x')) {
-      this.state.monthlyTotals[this.state.showMonthId][toDelete.category] = parseInt( this.state.monthlyTotals[this.state.showMonthId][toDelete.category] ) - parseInt( toDelete.price );
+      this.state.monthlyTotals[this.state.showMonthId][toDelete.category] = parseInt(this.state.monthlyTotals[this.state.showMonthId][toDelete.category], 10) - parseInt(toDelete.price, 10);
       this.setState({monthlyTotals: this.state.monthlyTotals});
       delete this.state.monthlyLog[this.state.showMonthId][key];
       this.setState({monthlyLog: this.state.monthlyLog});
@@ -219,16 +219,16 @@ var Reports = React.createClass({
 
   displayLog: function(key) {
     var data = this.state.monthlyLog[this.state.showMonthId][key];
-    return <ReportMonthLine key={key} date={key} category={data.category} price={data.price} deleteMonthlyLog={this.deleteMonthlyLog} />
+    return <ReportMonthLine key={key} date={key} category={data.category} price={data.price} deleteMonthlyLog={this.deleteMonthlyLog} />;
   },
   
   displaySummary: function(key) {
-    return <ReportSummaryLine key={key} category={key} total={this.state.monthlyTotals[this.state.showMonthId][key]} />
+    return <ReportSummaryLine key={key} category={key} total={this.state.monthlyTotals[this.state.showMonthId][key]} />;
   },
   
   render: function() {
     var monthLog = this.state.monthlyLog[this.state.showMonthId] || {};
-    var monthSummary = this.state.monthlyTotals[this.state.showMonthId] || {}
+    var monthSummary = this.state.monthlyTotals[this.state.showMonthId] || {};
     return (
 <div>
   <NavBar currentNav="reports" />
@@ -259,7 +259,7 @@ var ReportMonthLine = React.createClass({
   render: function() {
     return (
 <tr><td>{this.props.date}</td><td>{this.props.category}</td><td>{this.props.price}</td><td><button onClick={this.deleteLine.bind(null, this.props.date)}>&times;</button></td></tr>
-    )
+    );
   }
 });
 
@@ -268,7 +268,7 @@ var ReportSummaryLine = React.createClass({
   render: function() {
     return (
 <tr><td>{this.props.category}</td><td>{this.props.total}</td></tr>
-    )
+    );
   }
 });
 
@@ -311,7 +311,7 @@ var Settings = React.createClass({
   displayCat: function(key) {
     return (
       <li className="list-group-item" key={key}>{key} <button onClick={this.deleteCat.bind(null, key)}>&times;</button></li>
-    )
+    );
   },
   
   deleteCat: function(key) {
