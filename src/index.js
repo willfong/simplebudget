@@ -236,7 +236,7 @@ var Reports = React.createClass({
   <h1>Reports</h1>
   <p>&nbsp;</p>
   <table className="table">
-    <thead><tr><th>Category</th><th>Total</th></tr></thead>
+    <thead><tr><th>Category</th><th className="text-right">Total</th></tr></thead>
     <tbody>{Object.keys(monthSummary).sort().map(this.displaySummary)}</tbody>
   </table>
   <p>&nbsp;</p>
@@ -272,7 +272,7 @@ var ReportMonthLine = React.createClass({
 var ReportSummaryLine = React.createClass({
   render: function() {
     return (
-<tr><td>{this.props.category}</td><td>{this.props.total}</td></tr>
+<tr><td>{this.props.category}</td><td className="text-right">{this.props.total}</td></tr>
     );
   }
 });

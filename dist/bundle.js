@@ -24264,7 +24264,7 @@ var Reports = React.createClass({
               ),
               React.createElement(
                 'th',
-                null,
+                { className: 'text-right' },
                 'Total'
               )
             )
@@ -24380,7 +24380,7 @@ var ReportSummaryLine = React.createClass({
       ),
       React.createElement(
         'td',
-        null,
+        { className: 'text-right' },
         this.props.total
       )
     );
