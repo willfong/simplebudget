@@ -24301,7 +24301,7 @@ var Reports = React.createClass({
               ),
               React.createElement(
                 'th',
-                null,
+                { className: 'text-right' },
                 'Price'
               ),
               React.createElement(
@@ -24350,7 +24350,7 @@ var ReportMonthLine = React.createClass({
       ),
       React.createElement(
         'td',
-        null,
+        { className: 'text-right' },
         this.props.price
       ),
       React.createElement(

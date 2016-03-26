@@ -241,7 +241,7 @@ var Reports = React.createClass({
   </table>
   <p>&nbsp;</p>
   <table className="table table-striped">
-    <thead><tr><th>Date</th><th>Category</th><th>Price</th><th>&nbsp;</th></tr></thead>
+    <thead><tr><th>Date</th><th>Category</th><th className="text-right">Price</th><th>&nbsp;</th></tr></thead>
     <tbody>{Object.keys(monthLog).sort().reverse().map(this.displayLog)}</tbody>
   </table>    
   </div>
@@ -263,7 +263,7 @@ var ReportMonthLine = React.createClass({
     var minute = '0' + rawDate.getMinutes();
     var fmtDate = day + ' - ' + hour.substr(-2) + ':' + minute.substr(-2);
     return (
-<tr><td>{fmtDate}</td><td>{this.props.category}</td><td>{this.props.price}</td><td><button onClick={this.deleteLine.bind(null, this.props.date)}>&times;</button></td></tr>
+<tr><td>{fmtDate}</td><td>{this.props.category}</td><td className="text-right">{this.props.price}</td><td><button onClick={this.deleteLine.bind(null, this.props.date)}>&times;</button></td></tr>
     );
   }
 });
