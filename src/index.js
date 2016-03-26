@@ -259,9 +259,9 @@ var ReportMonthLine = React.createClass({
   render: function() {
     var rawDate = new Date(parseInt(this.props.date,10));
     var day = rawDate.getDate();
-    var hour = rawDate.getHours();
-    var minute = rawDate.getMinutes();
-    var fmtDate = day + ' - ' + hour + ':' + minute;
+    var hour = '0' + rawDate.getHours();
+    var minute = '0' + rawDate.getMinutes();
+    var fmtDate = day + ' - ' + hour.substr(-2) + ':' + minute.substr(-2);
     return (
 <tr><td>{fmtDate}</td><td>{this.props.category}</td><td>{this.props.price}</td><td><button onClick={this.deleteLine.bind(null, this.props.date)}>&times;</button></td></tr>
     );

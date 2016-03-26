@@ -24332,9 +24332,9 @@ var ReportMonthLine = React.createClass({
   render: function render() {
     var rawDate = new Date(parseInt(this.props.date, 10));
     var day = rawDate.getDate();
-    var hour = rawDate.getHours();
-    var minute = rawDate.getMinutes();
-    var fmtDate = day + ' - ' + hour + ':' + minute;
+    var hour = '0' + rawDate.getHours();
+    var minute = '0' + rawDate.getMinutes();
+    var fmtDate = day + ' - ' + hour.substr(-2) + ':' + minute.substr(-2);
     return React.createElement(
       'tr',
       null,
