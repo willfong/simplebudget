@@ -1820,16 +1820,25 @@ function computeChangedRoutes(prevState, nextState) {
   var leaveRoutes = undefined,
       enterRoutes = undefined;
   if (prevRoutes) {
-    leaveRoutes = prevRoutes.filter(function (route) {
-      return nextRoutes.indexOf(route) === -1 || routeParamsChanged(route, prevState, nextState);
-    });
+    (function () {
+      var parentIsLeaving = false;
+      leaveRoutes = prevRoutes.filter(function (route) {
+        if (parentIsLeaving) {
+          return true;
+        } else {
+          var isLeaving = nextRoutes.indexOf(route) === -1 || routeParamsChanged(route, prevState, nextState);
+          if (isLeaving) parentIsLeaving = true;
+          return isLeaving;
+        }
+      });
 
-    // onLeave hooks start at the leaf route.
-    leaveRoutes.reverse();
+      // onLeave hooks start at the leaf route.
+      leaveRoutes.reverse();
 
-    enterRoutes = nextRoutes.filter(function (route) {
-      return prevRoutes.indexOf(route) === -1 || leaveRoutes.indexOf(route) !== -1;
-    });
+      enterRoutes = nextRoutes.filter(function (route) {
+        return prevRoutes.indexOf(route) === -1 || leaveRoutes.indexOf(route) !== -1;
+      });
+    })();
   } else {
     leaveRoutes = [];
     enterRoutes = nextRoutes;
@@ -1993,7 +2002,9 @@ function createTransitionManager(history, routes) {
     _TransitionUtils.runLeaveHooks(leaveRoutes);
 
     // Tear down confirmation hooks for left routes
-    leaveRoutes.forEach(removeListenBeforeHooksForRoute);
+    leaveRoutes.filter(function (route) {
+      return enterRoutes.indexOf(route) === -1;
+    }).forEach(removeListenBeforeHooksForRoute);
 
     _TransitionUtils.runEnterHooks(enterRoutes, nextState, function (error, redirectInfo) {
       if (error) {
@@ -23889,6 +23900,8 @@ module.exports = warning;
 module.exports = require('./lib/React');
 
 },{"./lib/React":83}],216:[function(require,module,exports){
+'use strict';
+
 var React = require('react');
 var ReactDOM = require('react-dom');
 
@@ -23901,7 +23914,7 @@ var HashHistory = ReactRouter.hashHistory;
 var NavBar = React.createClass({
   displayName: 'NavBar',
 
-  render: function () {
+  render: function render() {
     return React.createElement(
       'nav',
       { className: 'navbar navbar-default navbar-fixed-top' },
@@ -23981,7 +23994,7 @@ var NavBar = React.createClass({
 var Home = React.createClass({
   displayName: 'Home',
 
-  render: function () {
+  render: function render() {
     return React.createElement(
       'div',
       null,
@@ -24020,7 +24033,7 @@ var Home = React.createClass({
 var Spend = React.createClass({
   displayName: 'Spend',
 
-  getInitialState: function () {
+  getInitialState: function getInitialState() {
     return {
       categories: [],
       monthlyTotals: {},
@@ -24028,7 +24041,7 @@ var Spend = React.createClass({
     };
   },
 
-  componentDidMount: function () {
+  componentDidMount: function componentDidMount() {
     var lsRef = localStorage.getItem('sbudget');
     if (lsRef) {
       this.state = JSON.parse(lsRef);
@@ -24039,23 +24052,23 @@ var Spend = React.createClass({
     }
   },
 
-  componentWillUpdate: function (nextProps, nextState) {
+  componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
     localStorage.setItem('sbudget', JSON.stringify(nextState));
   },
 
-  displayCat: function (key) {
+  displayCat: function displayCat(key) {
     return React.createElement(SpendCat, { key: key, category: key, index: this.state.categories.indexOf(key), spend: this.spend });
   },
 
-  spend: function (category, price) {
+  spend: function spend(category, price) {
     var timeId = new Date().getTime();
     var yearId = new Date().getFullYear().toString();
     var monthId = new Date().getMonth() + 1;
     var dateId;
     if (monthId < 10) {
-      dateId = parseInt(yearId + '0' + monthId);
+      dateId = parseInt(yearId + '0' + monthId, 10);
     } else {
-      dateId = parseInt(yearId + monthId);
+      dateId = parseInt(yearId + monthId, 10);
     }
 
     {/* Need to learn more about Javascript Objects... */}
@@ -24068,7 +24081,7 @@ var Spend = React.createClass({
       this.state.monthlyTotals[dateId][category] = 0;
     }
 
-    this.state.monthlyTotals[dateId][category] = parseInt(this.state.monthlyTotals[dateId][category]) + parseInt(price);
+    this.state.monthlyTotals[dateId][category] = parseInt(this.state.monthlyTotals[dateId][category], 10) + parseInt(price, 10);
     this.setState({ monthlyTotals: this.state.monthlyTotals });
 
     if (!this.state.monthlyLog[dateId]) {
@@ -24079,7 +24092,7 @@ var Spend = React.createClass({
     this.setState({ monthlyLog: this.state.monthlyLog });
   },
 
-  render: function () {
+  render: function render() {
     return React.createElement(
       'div',
       null,
@@ -24105,13 +24118,13 @@ var Spend = React.createClass({
 var SpendCat = React.createClass({
   displayName: 'SpendCat',
 
-  formSubmit: function (e) {
+  formSubmit: function formSubmit(e) {
     e.preventDefault();
     this.props.spend(this.props.category, this.refs.price.value);
     this.refs.priceEntry.reset();
   },
 
-  render: function () {
+  render: function render() {
     var heading = 'heading' + this.props.index;
     var collapse = 'collapse' + this.props.index;
     var hcollapse = '#collapse' + this.props.index;
@@ -24161,7 +24174,7 @@ var SpendCat = React.createClass({
 var Reports = React.createClass({
   displayName: 'Reports',
 
-  getInitialState: function () {
+  getInitialState: function getInitialState() {
     return {
       categories: [],
       monthlyTotals: {},
@@ -24170,7 +24183,7 @@ var Reports = React.createClass({
     };
   },
 
-  componentDidMount: function () {
+  componentDidMount: function componentDidMount() {
     var lsRef = localStorage.getItem('sbudget');
     if (lsRef) {
       this.state = JSON.parse(lsRef);
@@ -24180,42 +24193,42 @@ var Reports = React.createClass({
     }
   },
 
-  componentWillUpdate: function (nextProps, nextState) {
+  componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
     localStorage.setItem('sbudget', JSON.stringify(nextState));
   },
 
-  getMonthId: function () {
+  getMonthId: function getMonthId() {
     var yearId = new Date().getFullYear().toString();
     var monthId = new Date().getMonth() + 1;
     var dateId;
     if (monthId < 10) {
-      dateId = parseInt(yearId + '0' + monthId);
+      dateId = parseInt(yearId + '0' + monthId, 10);
     } else {
-      dateId = parseInt(yearId + monthId);
+      dateId = parseInt(yearId + monthId, 10);
     }
     return dateId;
   },
 
-  deleteMonthlyLog: function (key) {
+  deleteMonthlyLog: function deleteMonthlyLog(key) {
     var toDelete = this.state.monthlyLog[this.state.showMonthId][key];
     if (confirm('Are you sure you want to delete ' + toDelete.category + ' (' + toDelete.price + ')x')) {
-      this.state.monthlyTotals[this.state.showMonthId][toDelete.category] = parseInt(this.state.monthlyTotals[this.state.showMonthId][toDelete.category]) - parseInt(toDelete.price);
+      this.state.monthlyTotals[this.state.showMonthId][toDelete.category] = parseInt(this.state.monthlyTotals[this.state.showMonthId][toDelete.category], 10) - parseInt(toDelete.price, 10);
       this.setState({ monthlyTotals: this.state.monthlyTotals });
       delete this.state.monthlyLog[this.state.showMonthId][key];
       this.setState({ monthlyLog: this.state.monthlyLog });
     }
   },
 
-  displayLog: function (key) {
+  displayLog: function displayLog(key) {
     var data = this.state.monthlyLog[this.state.showMonthId][key];
     return React.createElement(ReportMonthLine, { key: key, date: key, category: data.category, price: data.price, deleteMonthlyLog: this.deleteMonthlyLog });
   },
 
-  displaySummary: function (key) {
+  displaySummary: function displaySummary(key) {
     return React.createElement(ReportSummaryLine, { key: key, category: key, total: this.state.monthlyTotals[this.state.showMonthId][key] });
   },
 
-  render: function () {
+  render: function render() {
     var monthLog = this.state.monthlyLog[this.state.showMonthId] || {};
     var monthSummary = this.state.monthlyTotals[this.state.showMonthId] || {};
     return React.createElement(
@@ -24312,18 +24325,23 @@ var Reports = React.createClass({
 var ReportMonthLine = React.createClass({
   displayName: 'ReportMonthLine',
 
-  deleteLine: function (key) {
+  deleteLine: function deleteLine(key) {
     this.props.deleteMonthlyLog(key);
   },
 
-  render: function () {
+  render: function render() {
+    var rawDate = new Date(parseInt(this.props.date, 10));
+    var day = rawDate.getDate();
+    var hour = rawDate.getHours();
+    var minute = rawDate.getMinutes();
+    var fmtDate = day + ' - ' + hour + ':' + minute;
     return React.createElement(
       'tr',
       null,
       React.createElement(
         'td',
         null,
-        this.props.date
+        fmtDate
       ),
       React.createElement(
         'td',
@@ -24351,7 +24369,7 @@ var ReportMonthLine = React.createClass({
 var ReportSummaryLine = React.createClass({
   displayName: 'ReportSummaryLine',
 
-  render: function () {
+  render: function render() {
     return React.createElement(
       'tr',
       null,
@@ -24372,7 +24390,7 @@ var ReportSummaryLine = React.createClass({
 var Settings = React.createClass({
   displayName: 'Settings',
 
-  getInitialState: function () {
+  getInitialState: function getInitialState() {
     return {
       categories: [],
       monthlyTotals: {},
@@ -24380,7 +24398,7 @@ var Settings = React.createClass({
     };
   },
 
-  componentDidMount: function () {
+  componentDidMount: function componentDidMount() {
     var lsRef = localStorage.getItem('sbudget');
     if (lsRef) {
       this.state = JSON.parse(lsRef);
@@ -24388,25 +24406,25 @@ var Settings = React.createClass({
     }
   },
 
-  componentWillUpdate: function (nextProps, nextState) {
+  componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
     localStorage.setItem('sbudget', JSON.stringify(nextState));
   },
 
-  clearData: function (e) {
+  clearData: function clearData(e) {
     if (confirm('Do you really want to delete all your data?')) {
       this.replaceState(this.getInitialState());
       localStorage.removeItem('sbudget');
     }
   },
 
-  createCat: function (e) {
+  createCat: function createCat(e) {
     e.preventDefault();
     this.state.categories.push(this.refs.newcat.value);
     this.setState({ categories: this.state.categories });
     this.refs.newCatForm.reset();
   },
 
-  displayCat: function (key) {
+  displayCat: function displayCat(key) {
     return React.createElement(
       'li',
       { className: 'list-group-item', key: key },
@@ -24420,14 +24438,14 @@ var Settings = React.createClass({
     );
   },
 
-  deleteCat: function (key) {
+  deleteCat: function deleteCat(key) {
     if (confirm('Are you sure you want to delete: ' + key + '?')) {
       this.state.categories.splice(this.state.categories.indexOf(key), 1);
       this.setState({ categories: this.state.categories });
     }
   },
 
-  render: function () {
+  render: function render() {
     return React.createElement(
       'div',
       null,
@@ -24486,7 +24504,7 @@ var Settings = React.createClass({
 var NotFound = React.createClass({
   displayName: 'NotFound',
 
-  render: function () {
+  render: function render() {
     return React.createElement(
       'h1',
       null,

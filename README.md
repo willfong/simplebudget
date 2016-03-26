@@ -6,4 +6,4 @@ Everything is saved in LocalStorage.
 
 See it in action: http://simplebudget.mobi
 
-Dev command: watchify src/index.js -o dist/bundle.js
+Dev command: watchify src/index.js -t babelify --outfile dist/bundle.js
