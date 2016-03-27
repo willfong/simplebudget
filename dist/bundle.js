@@ -24300,7 +24300,7 @@ var Reports = React.createClass({
           { className: 'row' },
           React.createElement(
             'div',
-            { className: 'col-md-2 col-sm-2 text-left' },
+            { className: 'col-md-2 col-sm-2 col-xs-2 text-left' },
             React.createElement(
               'h3',
               null,
@@ -24313,7 +24313,7 @@ var Reports = React.createClass({
           ),
           React.createElement(
             'div',
-            { className: 'col-md-8 col-sm-8 text-center' },
+            { className: 'col-md-8 col-sm-8 col-xs-8 text-center' },
             React.createElement(
               'h3',
               null,
@@ -24322,7 +24322,7 @@ var Reports = React.createClass({
           ),
           React.createElement(
             'div',
-            { className: 'col-md-2 col-sm-2 text-right' },
+            { className: 'col-md-2 col-sm-2 col-xs-2 text-right' },
             React.createElement(
               'h3',
               null,

@@ -285,9 +285,9 @@ var Reports = React.createClass({
   <h1>Reports</h1>
   <p>&nbsp;</p>
   <div className="row">
-    <div className="col-md-2 col-sm-2 text-left"><h3><button onClick={this.prevMonth}><span className="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button></h3></div>
-    <div className="col-md-8 col-sm-8 text-center"><h3>{this.state.showMonthId}</h3></div>
-    <div className="col-md-2 col-sm-2 text-right"><h3><button onClick={this.nextMonth}><span className="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button></h3></div>  
+    <div className="col-md-2 col-sm-2 col-xs-2 text-left"><h3><button onClick={this.prevMonth}><span className="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button></h3></div>
+    <div className="col-md-8 col-sm-8 col-xs-8 text-center"><h3>{this.state.showMonthId}</h3></div>
+    <div className="col-md-2 col-sm-2 col-xs-2 text-right"><h3><button onClick={this.nextMonth}><span className="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button></h3></div>  
   </div>
   <p>&nbsp;</p>
   <table className="table">
