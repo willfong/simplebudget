@@ -176,7 +176,8 @@ var Reports = React.createClass({
       categories: [],
       monthlyTotals: {},
       monthlyLog: {},
-      showMonthId: this.getMonthId()
+      showMonthId: this.getMonthId(),
+      showDelete: false
     };
   },
   
@@ -219,7 +220,7 @@ var Reports = React.createClass({
 
   displayLog: function(key) {
     var data = this.state.monthlyLog[this.state.showMonthId][key];
-    return <ReportMonthLine key={key} date={key} category={data.category} price={data.price} deleteMonthlyLog={this.deleteMonthlyLog} />;
+    return <ReportMonthLine key={key} date={key} category={data.category} price={data.price} deleteMonthlyLog={this.deleteMonthlyLog} showDelete={this.state.showDelete} />;
   },
   
   displaySummary: function(key) {
@@ -262,6 +263,11 @@ var Reports = React.createClass({
     this.setState({showMonthId: this.state.showMonthId});
   },
   
+  toggleDelete: function() {
+    this.state.showDelete = !this.state.showDelete;
+    this.setState({showDelete: this.state.showDelete});
+  },
+  
   render: function() {
     var y = parseInt(this.state.showMonthId.toString().substring(0,4), 10);
     var m = parseInt(this.state.showMonthId.toString().substring(5,6), 10) - 1;
@@ -278,7 +284,11 @@ var Reports = React.createClass({
   <div className="container">
   <h1>Reports</h1>
   <p>&nbsp;</p>
-  <h2><button onClick={this.prevMonth}><span className="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button> &nbsp; {this.state.showMonthId} &nbsp; <button onClick={this.nextMonth}><span className="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button></h2>
+  <div className="row">
+    <div className="col-md-2 col-sm-2 text-left"><h3><button onClick={this.prevMonth}><span className="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button></h3></div>
+    <div className="col-md-8 col-sm-8 text-center"><h3>{this.state.showMonthId}</h3></div>
+    <div className="col-md-2 col-sm-2 text-right"><h3><button onClick={this.nextMonth}><span className="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button></h3></div>  
+  </div>
   <p>&nbsp;</p>
   <table className="table">
     <thead><tr><th>Category</th><th className="text-right">Total</th></tr></thead>
@@ -287,9 +297,10 @@ var Reports = React.createClass({
 
   <p>&nbsp;</p>
   <table className="table table-striped">
-    <thead><tr><th>Date</th><th>Category</th><th className="text-right">Price</th><th>&nbsp;</th></tr></thead>
+    <thead><tr><th>Date</th><th>Category</th><th className="text-right">Price</th></tr></thead>
     <tbody>{Object.keys(monthLog).sort().reverse().map(this.displayLog)}</tbody>
-  </table>    
+  </table>
+  <p><span className="pull-right"><button onClick={this.toggleDelete}><span className="glyphicon glyphicon-trash" aria-hidden="true"></span></button></span></p>
   </div>
 </div>
     );
@@ -309,7 +320,7 @@ var ReportMonthLine = React.createClass({
     var minute = '0' + rawDate.getMinutes();
     var fmtDate = day + ' - ' + hour.substr(-2) + ':' + minute.substr(-2);
     return (
-<tr><td>{fmtDate}</td><td>{this.props.category}</td><td className="text-right">{this.props.price}</td><td><button onClick={this.deleteLine.bind(null, this.props.date)}>&times;</button></td></tr>
+<tr><td>{fmtDate}</td><td>{this.props.category}</td><td className="text-right">{this.props.price} {this.props.showDelete ? <button onClick={this.deleteLine.bind(null, this.props.date)}>&times;</button> : null }</td></tr>
     );
   }
 });

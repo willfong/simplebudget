@@ -24179,7 +24179,8 @@ var Reports = React.createClass({
       categories: [],
       monthlyTotals: {},
       monthlyLog: {},
-      showMonthId: this.getMonthId()
+      showMonthId: this.getMonthId(),
+      showDelete: false
     };
   },
 
@@ -24221,7 +24222,7 @@ var Reports = React.createClass({
 
   displayLog: function displayLog(key) {
     var data = this.state.monthlyLog[this.state.showMonthId][key];
-    return React.createElement(ReportMonthLine, { key: key, date: key, category: data.category, price: data.price, deleteMonthlyLog: this.deleteMonthlyLog });
+    return React.createElement(ReportMonthLine, { key: key, date: key, category: data.category, price: data.price, deleteMonthlyLog: this.deleteMonthlyLog, showDelete: this.state.showDelete });
   },
 
   displaySummary: function displaySummary(key) {
@@ -24264,6 +24265,11 @@ var Reports = React.createClass({
     this.setState({ showMonthId: this.state.showMonthId });
   },
 
+  toggleDelete: function toggleDelete() {
+    this.state.showDelete = !this.state.showDelete;
+    this.setState({ showDelete: this.state.showDelete });
+  },
+
   render: function render() {
     var y = parseInt(this.state.showMonthId.toString().substring(0, 4), 10);
     var m = parseInt(this.state.showMonthId.toString().substring(5, 6), 10) - 1;
@@ -24290,20 +24296,42 @@ var Reports = React.createClass({
           ' '
         ),
         React.createElement(
-          'h2',
-          null,
+          'div',
+          { className: 'row' },
           React.createElement(
-            'button',
-            { onClick: this.prevMonth },
-            React.createElement('span', { className: 'glyphicon glyphicon-chevron-left', 'aria-hidden': 'true' })
+            'div',
+            { className: 'col-md-2 col-sm-2 text-left' },
+            React.createElement(
+              'h3',
+              null,
+              React.createElement(
+                'button',
+                { onClick: this.prevMonth },
+                React.createElement('span', { className: 'glyphicon glyphicon-chevron-left', 'aria-hidden': 'true' })
+              )
+            )
           ),
-          '   ',
-          this.state.showMonthId,
-          '   ',
           React.createElement(
-            'button',
-            { onClick: this.nextMonth },
-            React.createElement('span', { className: 'glyphicon glyphicon-chevron-right', 'aria-hidden': 'true' })
+            'div',
+            { className: 'col-md-8 col-sm-8 text-center' },
+            React.createElement(
+              'h3',
+              null,
+              this.state.showMonthId
+            )
+          ),
+          React.createElement(
+            'div',
+            { className: 'col-md-2 col-sm-2 text-right' },
+            React.createElement(
+              'h3',
+              null,
+              React.createElement(
+                'button',
+                { onClick: this.nextMonth },
+                React.createElement('span', { className: 'glyphicon glyphicon-chevron-right', 'aria-hidden': 'true' })
+              )
+            )
           )
         ),
         React.createElement(
@@ -24366,11 +24394,6 @@ var Reports = React.createClass({
                 'th',
                 { className: 'text-right' },
                 'Price'
-              ),
-              React.createElement(
-                'th',
-                null,
-                ' '
               )
             )
           ),
@@ -24378,6 +24401,19 @@ var Reports = React.createClass({
             'tbody',
             null,
             Object.keys(monthLog).sort().reverse().map(this.displayLog)
+          )
+        ),
+        React.createElement(
+          'p',
+          null,
+          React.createElement(
+            'span',
+            { className: 'pull-right' },
+            React.createElement(
+              'button',
+              { onClick: this.toggleDelete },
+              React.createElement('span', { className: 'glyphicon glyphicon-trash', 'aria-hidden': 'true' })
+            )
           )
         )
       )
@@ -24414,16 +24450,13 @@ var ReportMonthLine = React.createClass({
       React.createElement(
         'td',
         { className: 'text-right' },
-        this.props.price
-      ),
-      React.createElement(
-        'td',
-        null,
-        React.createElement(
+        this.props.price,
+        ' ',
+        this.props.showDelete ? React.createElement(
           'button',
           { onClick: this.deleteLine.bind(null, this.props.date) },
           '×'
-        )
+        ) : null
       )
     );
   }
