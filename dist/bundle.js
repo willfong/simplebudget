@@ -24222,7 +24222,7 @@ var Reports = React.createClass({
 
   deleteMonthlyLog: function deleteMonthlyLog(key) {
     var toDelete = this.state.monthlyLog[this.state.showMonthId][key];
-    if (confirm('Are you sure you want to delete ' + toDelete.category + ' (' + toDelete.price + ')x')) {
+    if (confirm('Are you sure you want to delete ' + toDelete.category + ' (' + toDelete.price + ')?')) {
       this.state.monthlyTotals[this.state.showMonthId][toDelete.category] = parseInt(this.state.monthlyTotals[this.state.showMonthId][toDelete.category], 10) - parseInt(toDelete.price, 10);
       this.setState({ monthlyTotals: this.state.monthlyTotals });
       delete this.state.monthlyLog[this.state.showMonthId][key];
