@@ -24228,7 +24228,48 @@ var Reports = React.createClass({
     return React.createElement(ReportSummaryLine, { key: key, category: key, total: this.state.monthlyTotals[this.state.showMonthId][key] });
   },
 
+  prevMonth: function prevMonth(e) {
+    {/* this is so bad... */}
+    var y = parseInt(this.state.showMonthId.toString().substring(0, 4), 10);
+    var m = parseInt(this.state.showMonthId.toString().substring(4, 6), 10) - 1;
+
+    var rawPrevDate = new Date(y, m - 1, 1);
+
+    var month = rawPrevDate.getMonth() + 1;
+    if (month < 10) {
+      month = '0' + month.toString();
+    } else {
+      month = month.toString();
+    }
+    var newMonthId = parseInt(rawPrevDate.getFullYear().toString() + month, 10);
+    this.state.showMonthId = newMonthId;
+    this.setState({ showMonthId: this.state.showMonthId });
+  },
+
+  nextMonth: function nextMonth(e) {
+    {/* this is so bad... */}
+    var y = parseInt(this.state.showMonthId.toString().substring(0, 4), 10);
+    var m = parseInt(this.state.showMonthId.toString().substring(4, 6), 10) - 1;
+
+    var rawNextDate = new Date(y, m + 1, 1);
+
+    var month = rawNextDate.getMonth() + 1;
+    if (month < 10) {
+      month = '0' + month.toString();
+    } else {
+      month = month.toString();
+    }
+    var newMonthId = parseInt(rawNextDate.getFullYear().toString() + month, 10);
+    this.state.showMonthId = newMonthId;
+    this.setState({ showMonthId: this.state.showMonthId });
+  },
+
   render: function render() {
+    var y = parseInt(this.state.showMonthId.toString().substring(0, 4), 10);
+    var m = parseInt(this.state.showMonthId.toString().substring(5, 6), 10) - 1;
+    var rawCurDate = new Date(y, m, 1);
+    var rawPrevDate = new Date(y, m - 1, 1);
+
     var monthLog = this.state.monthlyLog[this.state.showMonthId] || {};
     var monthSummary = this.state.monthlyTotals[this.state.showMonthId] || {};
     return React.createElement(
@@ -24242,6 +24283,28 @@ var Reports = React.createClass({
           'h1',
           null,
           'Reports'
+        ),
+        React.createElement(
+          'p',
+          null,
+          ' '
+        ),
+        React.createElement(
+          'h2',
+          null,
+          React.createElement(
+            'button',
+            { onClick: this.prevMonth },
+            React.createElement('span', { className: 'glyphicon glyphicon-chevron-left', 'aria-hidden': 'true' })
+          ),
+          '   ',
+          this.state.showMonthId,
+          '   ',
+          React.createElement(
+            'button',
+            { onClick: this.nextMonth },
+            React.createElement('span', { className: 'glyphicon glyphicon-chevron-right', 'aria-hidden': 'true' })
+          )
         ),
         React.createElement(
           'p',
