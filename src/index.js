@@ -318,6 +318,12 @@ var Settings = React.createClass({
       <li className="list-group-item" key={key}>{key} <button onClick={this.deleteCat.bind(null, key)}>&times;</button></li>
     );
   },
+
+  displayOptionCat: function(key) {
+    return (
+      <option key={key}>{key}</option>
+    );
+  },
   
   deleteCat: function(key) {
     if (confirm('Are you sure you want to delete: '+key+'?')) {
@@ -325,7 +331,50 @@ var Settings = React.createClass({
       this.setState({categories: this.state.categories});
     }
   },
-  
+
+  manualSpend: function(e) {
+    e.preventDefault();
+    var category = this.refs.manualCat.value;
+    console.log(category);
+    var price = this.refs.manualPrice.value;
+
+    var rawRndTime = new Date();
+    var rndTime = (rawRndTime.getSeconds() * 1000) + rawRndTime.getMilliseconds();
+
+    var rawDate = new Date(this.refs.manualDate.value);
+    var timeId = rawDate.getTime() + rndTime;
+    console.log(timeId);
+    var yearId = rawDate.getFullYear().toString();
+    var monthId = rawDate.getMonth()+1;
+    var dateId;
+    if (monthId < 10) {
+      dateId = parseInt(yearId + '0' + monthId, 10);
+    } else {
+      dateId = parseInt(yearId + monthId, 10);
+    }
+
+    if (!this.state.monthlyTotals[dateId]) {
+      this.state.monthlyTotals[dateId] = {};
+    }
+    
+    if (!this.state.monthlyTotals[dateId][category]) {
+      this.state.monthlyTotals[dateId][category] = 0;
+    }
+    
+    this.state.monthlyTotals[dateId][category] = parseInt(this.state.monthlyTotals[dateId][category], 10) + parseInt(price, 10);
+    this.setState({monthlyTotals: this.state.monthlyTotals});
+    
+    
+    if (!this.state.monthlyLog[dateId]) {
+      this.state.monthlyLog[dateId] = {};
+    }
+    
+    this.state.monthlyLog[dateId][timeId] = { price: price, category: category };
+    this.setState({monthlyLog: this.state.monthlyLog});
+    this.refs.manSpendForm.reset();
+    
+  },
+
   render: function() {
     return (
 <div>
@@ -344,6 +393,26 @@ var Settings = React.createClass({
         </form>
       </li>
     </ul>
+    <p>&nbsp;</p>
+    <div className="panel panel-default">
+      <div className="panel-heading">
+        <h3 className="panel-title">Manual Spending Entry</h3>
+      </div>
+      <div className="panel-body">
+        <form className="form-inline" ref="manSpendForm" onSubmit={this.manualSpend}>
+          <div className="form-group">
+            <select className="form-control" ref="manualCat">{this.state.categories.map(this.displayOptionCat)}</select>
+          </div>
+          <div className="form-group">
+            <input type="date" className="form-control" ref="manualDate" />
+          </div>
+          <div className="form-group">
+            <input type="text" className="form-control" ref="manualPrice" placeholder="Price" />
+          </div>
+          <button type="submit" className="btn btn-default">Spend</button>
+        </form>
+      </div>
+    </div>    
     <p>&nbsp;</p>
     <button className="btn btn-danger btn-block" onClick={this.clearData}>Clear All Data</button>
   </div>

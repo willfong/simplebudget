@@ -24438,11 +24438,60 @@ var Settings = React.createClass({
     );
   },
 
+  displayOptionCat: function displayOptionCat(key) {
+    return React.createElement(
+      'option',
+      { key: key },
+      key
+    );
+  },
+
   deleteCat: function deleteCat(key) {
     if (confirm('Are you sure you want to delete: ' + key + '?')) {
       this.state.categories.splice(this.state.categories.indexOf(key), 1);
       this.setState({ categories: this.state.categories });
     }
+  },
+
+  manualSpend: function manualSpend(e) {
+    e.preventDefault();
+    var category = this.refs.manualCat.value;
+    console.log(category);
+    var price = this.refs.manualPrice.value;
+
+    var rawRndTime = new Date();
+    var rndTime = rawRndTime.getSeconds() * 1000 + rawRndTime.getMilliseconds();
+
+    var rawDate = new Date(this.refs.manualDate.value);
+    var timeId = rawDate.getTime() + rndTime;
+    console.log(timeId);
+    var yearId = rawDate.getFullYear().toString();
+    var monthId = rawDate.getMonth() + 1;
+    var dateId;
+    if (monthId < 10) {
+      dateId = parseInt(yearId + '0' + monthId, 10);
+    } else {
+      dateId = parseInt(yearId + monthId, 10);
+    }
+
+    if (!this.state.monthlyTotals[dateId]) {
+      this.state.monthlyTotals[dateId] = {};
+    }
+
+    if (!this.state.monthlyTotals[dateId][category]) {
+      this.state.monthlyTotals[dateId][category] = 0;
+    }
+
+    this.state.monthlyTotals[dateId][category] = parseInt(this.state.monthlyTotals[dateId][category], 10) + parseInt(price, 10);
+    this.setState({ monthlyTotals: this.state.monthlyTotals });
+
+    if (!this.state.monthlyLog[dateId]) {
+      this.state.monthlyLog[dateId] = {};
+    }
+
+    this.state.monthlyLog[dateId][timeId] = { price: price, category: category };
+    this.setState({ monthlyLog: this.state.monthlyLog });
+    this.refs.manSpendForm.reset();
   },
 
   render: function render() {
@@ -24482,6 +24531,56 @@ var Settings = React.createClass({
                 'button',
                 { type: 'submit', className: 'btn btn-default' },
                 'Add'
+              )
+            )
+          )
+        ),
+        React.createElement(
+          'p',
+          null,
+          ' '
+        ),
+        React.createElement(
+          'div',
+          { className: 'panel panel-default' },
+          React.createElement(
+            'div',
+            { className: 'panel-heading' },
+            React.createElement(
+              'h3',
+              { className: 'panel-title' },
+              'Manual Spending Entry'
+            )
+          ),
+          React.createElement(
+            'div',
+            { className: 'panel-body' },
+            React.createElement(
+              'form',
+              { className: 'form-inline', ref: 'manSpendForm', onSubmit: this.manualSpend },
+              React.createElement(
+                'div',
+                { className: 'form-group' },
+                React.createElement(
+                  'select',
+                  { className: 'form-control', ref: 'manualCat' },
+                  this.state.categories.map(this.displayOptionCat)
+                )
+              ),
+              React.createElement(
+                'div',
+                { className: 'form-group' },
+                React.createElement('input', { type: 'date', className: 'form-control', ref: 'manualDate' })
+              ),
+              React.createElement(
+                'div',
+                { className: 'form-group' },
+                React.createElement('input', { type: 'text', className: 'form-control', ref: 'manualPrice', placeholder: 'Price' })
+              ),
+              React.createElement(
+                'button',
+                { type: 'submit', className: 'btn btn-default' },
+                'Spend'
               )
             )
           )
