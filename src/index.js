@@ -407,7 +407,7 @@ var Settings = React.createClass({
             <input type="date" className="form-control" ref="manualDate" />
           </div>
           <div className="form-group">
-            <input type="text" className="form-control" ref="manualPrice" placeholder="Price" />
+            <input type="tel" className="form-control" ref="manualPrice" placeholder="Price" />
           </div>
           <button type="submit" className="btn btn-default">Spend</button>
         </form>

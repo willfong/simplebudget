@@ -24575,7 +24575,7 @@ var Settings = React.createClass({
               React.createElement(
                 'div',
                 { className: 'form-group' },
-                React.createElement('input', { type: 'text', className: 'form-control', ref: 'manualPrice', placeholder: 'Price' })
+                React.createElement('input', { type: 'tel', className: 'form-control', ref: 'manualPrice', placeholder: 'Price' })
               ),
               React.createElement(
                 'button',
