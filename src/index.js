@@ -134,10 +134,20 @@ var Spend = React.createClass({
 
 
 var SpendCat = React.createClass({
+  getInitialState: function() {
+    return {
+      text: ''
+    };
+  },
+
   formSubmit: function(e) {
     e.preventDefault();
     this.props.spend(this.props.category, this.refs.price.value);
     this.refs.priceEntry.reset();
+  },
+
+  handleChange: function(e) {
+    this.setState({text: e.target.value});
   },
 
   render: function() {
@@ -158,9 +168,9 @@ var SpendCat = React.createClass({
     <div className="panel-body">
       <form className="form-inline" ref="priceEntry" onSubmit={this.formSubmit}>
         <div className="form-group">
-          <input type="tel" className="form-control" ref="price" placeholder="Price" />
+          <input type="tel" className="form-control" ref="price" placeholder="Price" onChange={this.handleChange}/>
         </div>
-        <button type="submit" className="btn btn-default">Spent!</button>
+        <button type="submit" className="btn btn-default" disabled={this.state.text.length === 0}>Spent!</button>
       </form>
     </div>
   </div>
@@ -340,7 +350,8 @@ var Settings = React.createClass({
     return { 
       categories: [],
       monthlyTotals: {},
-      monthlyLog: {}
+      monthlyLog: {},
+      newCatName: ""
     };
   },
   
@@ -348,6 +359,7 @@ var Settings = React.createClass({
     var lsRef = localStorage.getItem('sbudget');
     if (lsRef) {
       this.state = JSON.parse(lsRef);
+      this.state.newCatName = '';
       this.forceUpdate();
     }
   },
@@ -367,6 +379,7 @@ var Settings = React.createClass({
     e.preventDefault();
     this.state.categories.push(this.refs.newcat.value);
     this.setState({categories: this.state.categories});
+    this.setState({newCatName: ''});
     this.refs.newCatForm.reset();
   },
 
@@ -387,6 +400,10 @@ var Settings = React.createClass({
       this.state.categories.splice(this.state.categories.indexOf(key), 1);
       this.setState({categories: this.state.categories});
     }
+  },
+
+  enableBtnNewCat: function(e) {
+    this.setState({newCatName: e.target.value});
   },
 
   manualSpend: function(e) {
@@ -444,9 +461,9 @@ var Settings = React.createClass({
       <li className="list-group-item">
         <form className="form-inline" ref="newCatForm" onSubmit={this.createCat}>
           <div className="form-group">
-            <input type="text" className="form-control" ref="newcat" placeholder="New Category" />
+            <input type="text" className="form-control" ref="newcat" placeholder="New Category" onChange={this.enableBtnNewCat}/>
           </div>
-          <button type="submit" className="btn btn-default">Add</button>
+          <button type="submit" className="btn btn-default" disabled={this.state.newCatName.length === 0}>Add</button>
         </form>
       </li>
     </ul>

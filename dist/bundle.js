@@ -24118,10 +24118,20 @@ var Spend = React.createClass({
 var SpendCat = React.createClass({
   displayName: 'SpendCat',
 
+  getInitialState: function getInitialState() {
+    return {
+      text: ''
+    };
+  },
+
   formSubmit: function formSubmit(e) {
     e.preventDefault();
     this.props.spend(this.props.category, this.refs.price.value);
     this.refs.priceEntry.reset();
+  },
+
+  handleChange: function handleChange(e) {
+    this.setState({ text: e.target.value });
   },
 
   render: function render() {
@@ -24157,11 +24167,11 @@ var SpendCat = React.createClass({
             React.createElement(
               'div',
               { className: 'form-group' },
-              React.createElement('input', { type: 'tel', className: 'form-control', ref: 'price', placeholder: 'Price' })
+              React.createElement('input', { type: 'tel', className: 'form-control', ref: 'price', placeholder: 'Price', onChange: this.handleChange })
             ),
             React.createElement(
               'button',
-              { type: 'submit', className: 'btn btn-default' },
+              { type: 'submit', className: 'btn btn-default', disabled: this.state.text.length === 0 },
               'Spent!'
             )
           )
@@ -24486,7 +24496,8 @@ var Settings = React.createClass({
     return {
       categories: [],
       monthlyTotals: {},
-      monthlyLog: {}
+      monthlyLog: {},
+      newCatName: ""
     };
   },
 
@@ -24494,6 +24505,7 @@ var Settings = React.createClass({
     var lsRef = localStorage.getItem('sbudget');
     if (lsRef) {
       this.state = JSON.parse(lsRef);
+      this.state.newCatName = '';
       this.forceUpdate();
     }
   },
@@ -24513,6 +24525,7 @@ var Settings = React.createClass({
     e.preventDefault();
     this.state.categories.push(this.refs.newcat.value);
     this.setState({ categories: this.state.categories });
+    this.setState({ newCatName: '' });
     this.refs.newCatForm.reset();
   },
 
@@ -24543,6 +24556,10 @@ var Settings = React.createClass({
       this.state.categories.splice(this.state.categories.indexOf(key), 1);
       this.setState({ categories: this.state.categories });
     }
+  },
+
+  enableBtnNewCat: function enableBtnNewCat(e) {
+    this.setState({ newCatName: e.target.value });
   },
 
   manualSpend: function manualSpend(e) {
@@ -24617,11 +24634,11 @@ var Settings = React.createClass({
               React.createElement(
                 'div',
                 { className: 'form-group' },
-                React.createElement('input', { type: 'text', className: 'form-control', ref: 'newcat', placeholder: 'New Category' })
+                React.createElement('input', { type: 'text', className: 'form-control', ref: 'newcat', placeholder: 'New Category', onChange: this.enableBtnNewCat })
               ),
               React.createElement(
                 'button',
-                { type: 'submit', className: 'btn btn-default' },
+                { type: 'submit', className: 'btn btn-default', disabled: this.state.newCatName.length === 0 },
                 'Add'
               )
             )
