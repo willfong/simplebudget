@@ -24281,11 +24281,6 @@ var Reports = React.createClass({
   },
 
   render: function render() {
-    var y = parseInt(this.state.showMonthId.toString().substring(0, 4), 10);
-    var m = parseInt(this.state.showMonthId.toString().substring(5, 6), 10) - 1;
-    var rawCurDate = new Date(y, m, 1);
-    var rawPrevDate = new Date(y, m - 1, 1);
-
     var monthLog = this.state.monthlyLog[this.state.showMonthId] || {};
     var monthSummary = this.state.monthlyTotals[this.state.showMonthId] || {};
     return React.createElement(
