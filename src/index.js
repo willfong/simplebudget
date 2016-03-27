@@ -285,9 +285,9 @@ var Reports = React.createClass({
   <h1>Reports</h1>
   <p>&nbsp;</p>
   <div className="row">
-    <div className="col-md-2 col-sm-2 col-xs-2 text-left"><h3><button onClick={this.prevMonth}><span className="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button></h3></div>
+    <div className="col-md-2 col-sm-2 col-xs-2 text-left"><h3><button className ="btn btn-default" onClick={this.prevMonth}><span className="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button></h3></div>
     <div className="col-md-8 col-sm-8 col-xs-8 text-center"><h3>{this.state.showMonthId}</h3></div>
-    <div className="col-md-2 col-sm-2 col-xs-2 text-right"><h3><button onClick={this.nextMonth}><span className="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button></h3></div>  
+    <div className="col-md-2 col-sm-2 col-xs-2 text-right"><h3><button className = "btn btn-default" onClick={this.nextMonth}><span className="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button></h3></div>  
   </div>
   <p>&nbsp;</p>
   <table className="table">
@@ -300,7 +300,7 @@ var Reports = React.createClass({
     <thead><tr><th>Date</th><th>Category</th><th className="text-right">Price</th></tr></thead>
     <tbody>{Object.keys(monthLog).sort().reverse().map(this.displayLog)}</tbody>
   </table>
-  <p><span className="pull-right"><button onClick={this.toggleDelete}><span className="glyphicon glyphicon-trash" aria-hidden="true"></span></button></span></p>
+  <p><button className="btn btn-danger pull-right" onClick={this.toggleDelete}><span className="glyphicon glyphicon-trash" aria-hidden="true"></span></button></p>
   </div>
 </div>
     );

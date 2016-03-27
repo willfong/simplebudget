@@ -24306,7 +24306,7 @@ var Reports = React.createClass({
               null,
               React.createElement(
                 'button',
-                { onClick: this.prevMonth },
+                { className: 'btn btn-default', onClick: this.prevMonth },
                 React.createElement('span', { className: 'glyphicon glyphicon-chevron-left', 'aria-hidden': 'true' })
               )
             )
@@ -24328,7 +24328,7 @@ var Reports = React.createClass({
               null,
               React.createElement(
                 'button',
-                { onClick: this.nextMonth },
+                { className: 'btn btn-default', onClick: this.nextMonth },
                 React.createElement('span', { className: 'glyphicon glyphicon-chevron-right', 'aria-hidden': 'true' })
               )
             )
@@ -24407,13 +24407,9 @@ var Reports = React.createClass({
           'p',
           null,
           React.createElement(
-            'span',
-            { className: 'pull-right' },
-            React.createElement(
-              'button',
-              { onClick: this.toggleDelete },
-              React.createElement('span', { className: 'glyphicon glyphicon-trash', 'aria-hidden': 'true' })
-            )
+            'button',
+            { className: 'btn btn-danger pull-right', onClick: this.toggleDelete },
+            React.createElement('span', { className: 'glyphicon glyphicon-trash', 'aria-hidden': 'true' })
           )
         )
       )
