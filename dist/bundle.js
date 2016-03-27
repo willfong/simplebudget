@@ -24525,9 +24525,4 @@ var routes = React.createElement(
 
 ReactDOM.render(routes, document.querySelector('#app'));
 
-var lsRef = localStorage.getItem('sbudget');
-if (lsRef) {
-  HashHistory.replace('/spend');
-}
-
 },{"react":215,"react-dom":2,"react-router":30}]},{},[216]);

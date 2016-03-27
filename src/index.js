@@ -374,8 +374,3 @@ var routes = (
 
 
 ReactDOM.render(routes, document.querySelector('#app'));
-
-var lsRef = localStorage.getItem('sbudget');
-if (lsRef) {
-  HashHistory.replace('/spend');
-}
