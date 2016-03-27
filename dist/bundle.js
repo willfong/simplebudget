@@ -24537,7 +24537,7 @@ var Settings = React.createClass({
       ' ',
       React.createElement(
         'button',
-        { onClick: this.deleteCat.bind(null, key) },
+        { className: 'btn btn-default btn-xs pull-right', onClick: this.deleteCat.bind(null, key) },
         '×'
       )
     );
@@ -24617,29 +24617,37 @@ var Settings = React.createClass({
           'Settings'
         ),
         React.createElement(
-          'ul',
-          { className: 'list-group' },
+          'div',
+          { className: 'panel panel-default' },
           React.createElement(
-            'li',
-            { className: 'list-group-item active' },
-            'Spending Categories'
-          ),
-          this.state.categories.map(this.displayCat),
-          React.createElement(
-            'li',
-            { className: 'list-group-item' },
+            'div',
+            { className: 'panel-heading' },
             React.createElement(
-              'form',
-              { className: 'form-inline', ref: 'newCatForm', onSubmit: this.createCat },
+              'h3',
+              { className: 'panel-title' },
+              'Spending Categories'
+            )
+          ),
+          React.createElement(
+            'ul',
+            { className: 'list-group' },
+            this.state.categories.map(this.displayCat),
+            React.createElement(
+              'li',
+              { className: 'list-group-item' },
               React.createElement(
-                'div',
-                { className: 'form-group' },
-                React.createElement('input', { type: 'text', className: 'form-control', ref: 'newcat', placeholder: 'New Category', onChange: this.enableBtnNewCat })
-              ),
-              React.createElement(
-                'button',
-                { type: 'submit', className: 'btn btn-default', disabled: this.state.newCatName.length === 0 },
-                'Add'
+                'form',
+                { className: 'form-inline', ref: 'newCatForm', onSubmit: this.createCat },
+                React.createElement(
+                  'div',
+                  { className: 'form-group' },
+                  React.createElement('input', { type: 'text', className: 'form-control', ref: 'newcat', placeholder: 'New Category', onChange: this.enableBtnNewCat })
+                ),
+                React.createElement(
+                  'button',
+                  { type: 'submit', className: 'btn btn-default', disabled: this.state.newCatName.length === 0 },
+                  'Add'
+                )
               )
             )
           )

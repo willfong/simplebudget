@@ -385,7 +385,7 @@ var Settings = React.createClass({
 
   displayCat: function(key) {
     return (
-      <li className="list-group-item" key={key}>{key} <button onClick={this.deleteCat.bind(null, key)}>&times;</button></li>
+      <li className="list-group-item" key={key}>{key} <button className="btn btn-default btn-xs pull-right" onClick={this.deleteCat.bind(null, key)}>&times;</button></li>
     );
   },
 
@@ -455,18 +455,20 @@ var Settings = React.createClass({
   <NavBar currentNav="settings" />
   <div className="container">
     <h2>Settings</h2>
-    <ul className="list-group">
-      <li className="list-group-item active">Spending Categories</li>
-      {this.state.categories.map(this.displayCat)}
-      <li className="list-group-item">
-        <form className="form-inline" ref="newCatForm" onSubmit={this.createCat}>
-          <div className="form-group">
-            <input type="text" className="form-control" ref="newcat" placeholder="New Category" onChange={this.enableBtnNewCat}/>
-          </div>
-          <button type="submit" className="btn btn-default" disabled={this.state.newCatName.length === 0}>Add</button>
-        </form>
-      </li>
-    </ul>
+    <div className="panel panel-default">
+      <div className="panel-heading"><h3 className="panel-title">Spending Categories</h3></div>
+      <ul className="list-group">
+        {this.state.categories.map(this.displayCat)}
+        <li className="list-group-item">
+          <form className="form-inline" ref="newCatForm" onSubmit={this.createCat}>
+            <div className="form-group">
+              <input type="text" className="form-control" ref="newcat" placeholder="New Category" onChange={this.enableBtnNewCat}/>
+            </div>
+            <button type="submit" className="btn btn-default" disabled={this.state.newCatName.length === 0}>Add</button>
+          </form>
+        </li>
+      </ul>
+    </div>
     <p>&nbsp;</p>
     <div className="panel panel-default">
       <div className="panel-heading">
