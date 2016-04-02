@@ -10,6 +10,16 @@ var Route = ReactRouter.Route;
 var Navigation = ReactRouter.Navigation;
 var HashHistory = ReactRouter.hashHistory;
 
+var moment = require('moment');
+
+// Because of a bug, cant use below
+// moment.locale('cs');
+
+// This is the woraround
+moment.locale('en');
+
+require('moment/locale/zh-tw');
+moment.locale('zh-tw');
 
 var NavBar = React.createClass({
   render: function() {
@@ -61,6 +71,7 @@ var Home = React.createClass({
 var Spend = React.createClass({
   getInitialState: function() {
     return {
+      language: 'en',
       categories: [],
       monthlyTotals: {},
       monthlyLog: {}
@@ -201,6 +212,7 @@ var SpendCat = React.createClass({
 var Reports = React.createClass({
   getInitialState: function() {
     return {
+      language: 'en',
       categories: [],
       monthlyTotals: {},
       monthlyLog: {},
@@ -216,6 +228,15 @@ var Reports = React.createClass({
       {/* TODO: fix me. better handle of defaults */}
       this.state.showMonthId = this.getMonthId();
       this.forceUpdate();
+      switch (this.state.language) {
+        case 'en':
+          moment.locale('en');
+          break;
+        case 'zh-tw':
+          require('moment/locale/zh-tw');
+          moment.locale('zh-tw');
+          break;
+      }
     }
     this.state.showDelete = false;
   },
@@ -300,6 +321,12 @@ var Reports = React.createClass({
   render: function() {
     var monthLog = this.state.monthlyLog[this.state.showMonthId] || {};
     var monthSummary = this.state.monthlyTotals[this.state.showMonthId] || {};
+    var formattedMonth;
+    if (this.state.language == 'zh-tw') {
+      formattedMonth = '民國' + moment(this.state.showMonthId + '01').subtract(1911, 'years').format('Y MMMM');
+    } else {
+      formattedMonth = moment(this.state.showMonthId + '01').format('MMMM YYYY');
+    }
     return (
 <div>
   <NavBar currentNav="reports" />
@@ -308,7 +335,7 @@ var Reports = React.createClass({
   <p>&nbsp;</p>
   <div className="row">
     <div className="col-md-2 col-sm-2 col-xs-2 text-left"><h3><button className ="btn btn-default" onClick={this.prevMonth}><span className="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button></h3></div>
-    <div className="col-md-8 col-sm-8 col-xs-8 text-center"><h3>{this.state.showMonthId}</h3></div>
+    <div className="col-md-8 col-sm-8 col-xs-8 text-center"><h3>{formattedMonth}</h3></div>
     <div className="col-md-2 col-sm-2 col-xs-2 text-right"><h3><button className = "btn btn-default" onClick={this.nextMonth}><span className="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button></h3></div>  
   </div>
   <p>&nbsp;</p>
@@ -356,10 +383,21 @@ var ReportSummaryLine = React.createClass({
   }
 });
 
+var LanguageOptions = React.createClass({
+  handleChange: function(e) {
+    this.props.changeLanguage(e.target.value);
+  },
+  render: function() {
+    return (
+      <select className="form-control" ref="languageSelect" onChange={this.handleChange} value={this.props.language}><option value="en">English</option><option value="zh-tw">繁體中文</option></select>      
+    );
+  }
+});
 
 var Settings = React.createClass({
   getInitialState: function() {
     return { 
+      language: 'en',
       categories: [],
       monthlyTotals: {},
       monthlyLog: {},
@@ -378,6 +416,11 @@ var Settings = React.createClass({
   
   componentWillUpdate: function(nextProps, nextState) {
     localStorage.setItem('sbudget', JSON.stringify(nextState));
+  },
+  
+  changeLanguage: function(lang) {
+    this.state.language = lang;
+    this.setState({language: this.state.language});
   },
   
   clearData: function(e) {
@@ -480,6 +523,15 @@ var Settings = React.createClass({
           </form>
         </li>
       </ul>
+    </div>
+    <p>&nbsp;</p>
+    <div className="panel panel-default">
+      <div className="panel-heading">
+        <h3 className="panel-title">Language</h3>
+      </div>
+      <div className="panel-body">
+        <LanguageOptions changeLanguage={this.changeLanguage} language={this.state.language} />
+      </div>
     </div>
     <p>&nbsp;</p>
     <div className="panel panel-default">
