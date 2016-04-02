@@ -24134,6 +24134,7 @@ var SpendCat = React.createClass({
     e.preventDefault();
     this.props.spend(this.props.category, this.refs.price.value);
     this.refs.priceEntry.reset();
+    this.state.text = '';
   },
 
   handleChange: function handleChange(e) {
