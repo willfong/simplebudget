@@ -138,7 +138,8 @@ var Spend = React.createClass({
 var SpendCat = React.createClass({
   getInitialState: function() {
     return {
-      text: ''
+      enableSubmit: false,
+      inputError: ''
     };
   },
 
@@ -146,17 +147,30 @@ var SpendCat = React.createClass({
     e.preventDefault();
     this.props.spend(this.props.category, this.refs.price.value);
     this.refs.priceEntry.reset();
-    this.state.text = '';
+    this.state.enableSubmit = false;
   },
 
   handleChange: function(e) {
-    this.setState({text: e.target.value});
+    if (e.target.value.length > 0) {
+      if (e.target.value > 0) {
+        this.state.enableSubmit = true;
+        this.state.inputError = '';
+      } else {
+        this.state.enableSubmit = false;
+        this.state.inputError = ' has-error has-feedback';
+      }
+    } else {
+      this.state.inputError = '';
+      this.state.enableSubmit = false;
+    }
+    this.setState({inputError: this.state.inputError, enableSubmit: this.state.enableSubmit});
   },
 
   render: function() {
     var heading = 'heading'+this.props.index;
     var collapse = 'collapse'+this.props.index;
     var hcollapse = '#collapse'+this.props.index;
+    var inputClass = 'form-group' + this.state.inputError;
     
     return (
 <div className="panel panel-default">
@@ -170,10 +184,11 @@ var SpendCat = React.createClass({
   <div id={collapse} className="panel-collapse collapse" role="tabpanel" aria-labelledby={heading}>
     <div className="panel-body">
       <form className="form-inline" ref="priceEntry" onSubmit={this.formSubmit}>
-        <div className="form-group">
+        <div className={inputClass}>
           <input type="tel" className="form-control" ref="price" placeholder="Price" onChange={this.handleChange}/>
+          <span className="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
         </div>
-        <button type="submit" className="btn btn-default" disabled={this.state.text.length === 0}>Spent!</button>
+        <button type="submit" className="btn btn-default" disabled={!this.state.enableSubmit}>Spent!</button>
       </form>
     </div>
   </div>
