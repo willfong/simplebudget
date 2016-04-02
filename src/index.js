@@ -1,3 +1,5 @@
+/*global localStorage*/
+
 var React = require('react');
 var ReactDOM = require('react-dom');
 
@@ -199,6 +201,7 @@ var Reports = React.createClass({
       this.state.showMonthId = this.getMonthId();
       this.forceUpdate();
     }
+    this.state.showDelete = false;
   },
   
   componentWillUpdate: function(nextProps, nextState) {
