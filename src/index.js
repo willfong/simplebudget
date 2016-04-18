@@ -194,12 +194,17 @@ var SpendCat = React.createClass({
   </div>
   <div id={collapse} className="panel-collapse collapse" role="tabpanel" aria-labelledby={heading}>
     <div className="panel-body">
-      <form className="form-inline" ref="priceEntry" onSubmit={this.formSubmit}>
-        <div className={inputClass}>
-          <input type="tel" className="form-control" ref="price" placeholder="Price" onChange={this.handleChange}/>
-          <span className="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+      <form ref="priceEntry" onSubmit={this.formSubmit}>
+        <div className="row">
+          <div className="col-md-10 col-xs-10">
+            <div className={inputClass}>
+                <input type="tel" className="form-control" ref="price" placeholder="Price" onChange={this.handleChange}/>
+            </div>
+          </div> 
+          <div className="col-md-2 col-xs-2">
+            <button type="submit" className="btn btn-default" disabled={!this.state.enableSubmit}>Spent!</button>
+          </div>
         </div>
-        <button type="submit" className="btn btn-default" disabled={!this.state.enableSubmit}>Spent!</button>
       </form>
     </div>
   </div>

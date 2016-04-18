@@ -27987,17 +27987,28 @@ var SpendCat = React.createClass({
           { className: 'panel-body' },
           React.createElement(
             'form',
-            { className: 'form-inline', ref: 'priceEntry', onSubmit: this.formSubmit },
+            { ref: 'priceEntry', onSubmit: this.formSubmit },
             React.createElement(
               'div',
-              { className: inputClass },
-              React.createElement('input', { type: 'tel', className: 'form-control', ref: 'price', placeholder: 'Price', onChange: this.handleChange }),
-              React.createElement('span', { className: 'glyphicon glyphicon-remove form-control-feedback', 'aria-hidden': 'true' })
-            ),
-            React.createElement(
-              'button',
-              { type: 'submit', className: 'btn btn-default', disabled: !this.state.enableSubmit },
-              'Spent!'
+              { className: 'row' },
+              React.createElement(
+                'div',
+                { className: 'col-md-10 col-xs-10' },
+                React.createElement(
+                  'div',
+                  { className: inputClass },
+                  React.createElement('input', { type: 'tel', className: 'form-control', ref: 'price', placeholder: 'Price', onChange: this.handleChange })
+                )
+              ),
+              React.createElement(
+                'div',
+                { className: 'col-md-2 col-xs-2' },
+                React.createElement(
+                  'button',
+                  { type: 'submit', className: 'btn btn-default', disabled: !this.state.enableSubmit },
+                  'Spent!'
+                )
+              )
             )
           )
         )
