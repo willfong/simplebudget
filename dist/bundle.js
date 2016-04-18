@@ -27993,7 +27993,7 @@ var SpendCat = React.createClass({
               { className: 'row' },
               React.createElement(
                 'div',
-                { className: 'col-md-10 col-xs-10' },
+                { className: 'col-md-10 col-xs-8' },
                 React.createElement(
                   'div',
                   { className: inputClass },
@@ -28002,7 +28002,7 @@ var SpendCat = React.createClass({
               ),
               React.createElement(
                 'div',
-                { className: 'col-md-2 col-xs-2' },
+                { className: 'col-md-2 col-xs-4' },
                 React.createElement(
                   'button',
                   { type: 'submit', className: 'btn btn-default', disabled: !this.state.enableSubmit },

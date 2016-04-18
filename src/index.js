@@ -196,12 +196,12 @@ var SpendCat = React.createClass({
     <div className="panel-body">
       <form ref="priceEntry" onSubmit={this.formSubmit}>
         <div className="row">
-          <div className="col-md-10 col-xs-10">
+          <div className="col-md-10 col-xs-8">
             <div className={inputClass}>
                 <input type="tel" className="form-control" ref="price" placeholder="Price" onChange={this.handleChange}/>
             </div>
           </div> 
-          <div className="col-md-2 col-xs-2">
+          <div className="col-md-2 col-xs-4">
             <button type="submit" className="btn btn-default" disabled={!this.state.enableSubmit}>Spent!</button>
           </div>
         </div>
