@@ -355,8 +355,6 @@ var Reports = React.createClass({
       }
       return row;
     });
-    
-    console.log(logLines);
 
     return (
 <div>
@@ -499,7 +497,6 @@ var Settings = React.createClass({
   manualSpend: function(e) {
     e.preventDefault();
     var category = this.refs.manualCat.value;
-    console.log(category);
     var price = this.refs.manualPrice.value;
 
     var rawRndTime = new Date();
@@ -507,7 +504,6 @@ var Settings = React.createClass({
 
     var rawDate = new Date(this.refs.manualDate.value);
     var timeId = rawDate.getTime() + rndTime;
-    console.log(timeId);
     var yearId = rawDate.getFullYear().toString();
     var monthId = rawDate.getMonth()+1;
     var dateId;
