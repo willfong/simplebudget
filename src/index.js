@@ -12,6 +12,7 @@ var HashHistory = ReactRouter.hashHistory;
 
 var moment = require('moment');
 
+
 // Because of a bug, cant use below
 // moment.locale('cs');
 
@@ -20,6 +21,9 @@ moment.locale('en');
 
 require('moment/locale/zh-tw');
 moment.locale('zh-tw');
+
+var classNames = require('classnames');
+
 
 var NavBar = React.createClass({
   render: function() {
@@ -273,11 +277,10 @@ var Reports = React.createClass({
     }
   },
 
-  displayLog: function(key) {
-    var data = this.state.monthlyLog[this.state.showMonthId][key];
-    return <ReportMonthLine key={key} date={key} category={data.category} price={data.price} deleteMonthlyLog={this.deleteMonthlyLog} showDelete={this.state.showDelete} />;
+  displayLog: function(data) {
+    return <ReportMonthLine key={data.key} date={data.key} fmtDay={data.fmtDay} category={data.category} price={data.price} deleteMonthlyLog={this.deleteMonthlyLog} showDelete={this.state.showDelete} />;
   },
-  
+
   displaySummary: function(key) {
     return <ReportSummaryLine key={key} category={key} total={this.state.monthlyTotals[this.state.showMonthId][key]} />;
   },
@@ -332,6 +335,29 @@ var Reports = React.createClass({
     } else {
       formattedMonth = moment(this.state.showMonthId + '01').format('MMMM YYYY');
     }
+    
+    var logCopy = Object.keys(monthLog).sort().reverse().map((key,i) => {
+      var data = this.state.monthlyLog[this.state.showMonthId][key];
+      var rawDate = new Date(parseInt(key,10));
+      var day = rawDate.getDate();
+      data.fmtDay = day;
+      data.key = key;
+      return data;
+    });
+    
+    var curDay = 0;
+    var logLines = logCopy.map((row, i) => {
+      if (i==0 || row.fmtDay != curDay ) {
+        row.fmtDay = row.fmtDay;
+        curDay = row.fmtDay;
+      } else {
+        row.fmtDay = '';
+      }
+      return row;
+    });
+    
+    console.log(logLines);
+
     return (
 <div>
   <NavBar currentNav="reports" />
@@ -350,9 +376,9 @@ var Reports = React.createClass({
   </table>
 
   <p>&nbsp;</p>
-  <table className="table table-striped">
-    <thead><tr><th>Date</th><th>Category</th><th className="text-right">Price</th></tr></thead>
-    <tbody>{Object.keys(monthLog).sort().reverse().map(this.displayLog)}</tbody>
+  <table className="table">
+    <thead><tr><th colSpan="2">Date</th><th>Category</th><th className="text-right">Price</th></tr></thead>
+    <tbody>{logLines.map(this.displayLog)}</tbody>
   </table>
   <p><button className="btn btn-danger pull-right" onClick={this.toggleDelete}><span className="glyphicon glyphicon-trash" aria-hidden="true"></span></button></p>
   </div>
@@ -364,17 +390,21 @@ var Reports = React.createClass({
 
 var ReportMonthLine = React.createClass({
   deleteLine: function(key) {
-    this.props.deleteMonthlyLog(key);
+    this.props.deleteMonthlyLog(key);  
+  },
+  
+  evenOddActive: function(day) {
+    return day % 2;
   },
   
   render: function() {
     var rawDate = new Date(parseInt(this.props.date,10));
-    var day = rawDate.getDate();
     var hour = '0' + rawDate.getHours();
     var minute = '0' + rawDate.getMinutes();
-    var fmtDate = day + ' - ' + hour.substr(-2) + ':' + minute.substr(-2);
+    var fmtDate = hour.substr(-2) + ':' + minute.substr(-2);
+    var rowClass = classNames({'active': this.evenOddActive(rawDate.getDate())});
     return (
-<tr><td>{fmtDate}</td><td>{this.props.category}</td><td className="text-right">{this.props.price} {this.props.showDelete ? <button onClick={this.deleteLine.bind(null, this.props.date)}>&times;</button> : null }</td></tr>
+<tr className={rowClass}><td>{this.props.fmtDay}</td><td>{fmtDate}</td><td>{this.props.category}</td><td className="text-right">{this.props.price} {this.props.showDelete ? <button onClick={this.deleteLine.bind(null, this.props.date)}>&times;</button> : null }</td></tr>
     );
   }
 });
