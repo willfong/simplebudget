@@ -278,7 +278,7 @@ var Reports = React.createClass({
   },
 
   displayLog: function(data) {
-    return <ReportMonthLine key={data.key} date={data.key} fmtDay={data.fmtDay} category={data.category} price={data.price} deleteMonthlyLog={this.deleteMonthlyLog} showDelete={this.state.showDelete} />;
+    return <ReportMonthLine key={data.key} date={data.key} fmtDay={data.fmtDay} category={data.category} price={data.price} rowActive={data.rowActive} deleteMonthlyLog={this.deleteMonthlyLog} showDelete={this.state.showDelete} />;
   },
 
   displaySummary: function(key) {
@@ -346,13 +346,16 @@ var Reports = React.createClass({
     });
     
     var curDay = 0;
+    var rowActive = false;
     var logLines = logCopy.map((row, i) => {
       if (i==0 || row.fmtDay != curDay ) {
         row.fmtDay = row.fmtDay;
         curDay = row.fmtDay;
+        rowActive = !rowActive;
       } else {
         row.fmtDay = '';
       }
+      row.rowActive = rowActive;
       return row;
     });
 
@@ -391,16 +394,12 @@ var ReportMonthLine = React.createClass({
     this.props.deleteMonthlyLog(key);  
   },
   
-  evenOddActive: function(day) {
-    return day % 2;
-  },
-  
   render: function() {
     var rawDate = new Date(parseInt(this.props.date,10));
     var hour = '0' + rawDate.getHours();
     var minute = '0' + rawDate.getMinutes();
     var fmtDate = hour.substr(-2) + ':' + minute.substr(-2);
-    var rowClass = classNames({'active': this.evenOddActive(rawDate.getDate())});
+    var rowClass = classNames({'active': this.props.rowActive});
     return (
 <tr className={rowClass}><td>{this.props.fmtDay}</td><td>{fmtDate}</td><td>{this.props.category}</td><td className="text-right">{this.props.price} {this.props.showDelete ? <button onClick={this.deleteLine.bind(null, this.props.date)}>&times;</button> : null }</td></tr>
     );
