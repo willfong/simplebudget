@@ -28454,7 +28454,7 @@ var Settings = React.createClass({
       monthlyTotals: {},
       monthlyLog: {},
       newCatName: "",
-      dbToken: ''
+      dbToken: false
     };
   },
 
@@ -28520,24 +28520,16 @@ var Settings = React.createClass({
     }
   },
 
-  dropbox: function dropbox() {
-    window.open('https://www.dropbox.com/oauth2/authorize?response_type=code&client_id=t7i1tds69yt0od4', 'Login To Dropbox');
-  },
-
-  dbCode2Token: function dbCode2Token(e) {
-    e.preventDefault();
+  dbCode2Token: function dbCode2Token(dbCode) {
     var that = this;
     {/* TODO: All this needs to be refactored to be, you know, secure */}
-    var dbToken = this.refs.dbCode.value;
-    $.post('https://api.dropboxapi.com/oauth2/token', { code: dbToken, grant_type: 'authorization_code', client_id: 't7i1tds69yt0od4', client_secret: '9fkqh566wx55lhq' }, function (data) {
+    $.post('https://api.dropboxapi.com/oauth2/token', { code: dbCode, grant_type: 'authorization_code', client_id: 't7i1tds69yt0od4', client_secret: '9fkqh566wx55lhq' }, function (data) {
       {/* TODO: This is where it's supposed to work... */}
-      that.refs.dbForm.reset();
     }).error(function (data) {
       {/* TODO: Why does jQ think the response was an error? */}
       var token = JSON.parse(data.responseText).access_token;
       that.state.dbToken = token;
       that.setState({ dbToken: token });
-      that.refs.dbForm.reset();
     });
   },
 
@@ -28591,6 +28583,7 @@ var Settings = React.createClass({
 
   dbRevoke: function dbRevoke(e) {
     e.preventDefault();
+    var that = this;
     if (confirm('Are you sure you want to revoke access to Dropbox?')) {
       var dbToken = this.state.dbToken;
       $.ajax({
@@ -28600,8 +28593,8 @@ var Settings = React.createClass({
           'Authorization': 'Bearer ' + dbToken
         }
       }).done(function (data) {
-        this.state.dbToken = '';
-        this.setState({ dbToken: '' });
+        that.state.dbToken = false;
+        that.setState({ dbToken: false });
       });
     }
   },
@@ -28741,55 +28734,7 @@ var Settings = React.createClass({
           React.createElement(
             'div',
             { className: 'panel-body' },
-            React.createElement(
-              'button',
-              { className: 'btn btn-primary btn-block', onClick: this.dropbox },
-              'Get Code'
-            ),
-            React.createElement(
-              'p',
-              null,
-              ' '
-            ),
-            React.createElement(
-              'form',
-              { className: 'form-inline', ref: 'dbForm', onSubmit: this.dbCode2Token },
-              React.createElement(
-                'div',
-                { className: 'form-group' },
-                React.createElement('input', { type: 'text', className: 'form-control', ref: 'dbCode', placeholder: 'Dropbox Code', size: '55' })
-              ),
-              React.createElement(
-                'button',
-                { type: 'submit', className: 'btn btn-default' },
-                'Link'
-              )
-            ),
-            React.createElement(
-              'button',
-              { className: 'btn btn-primary btn-block', onClick: this.dbSave },
-              'Save to Dropbox'
-            ),
-            React.createElement(
-              'p',
-              null,
-              ' '
-            ),
-            React.createElement(
-              'button',
-              { className: 'btn btn-primary btn-block', onClick: this.dbRestore },
-              'Restore from Dropbox'
-            ),
-            React.createElement(
-              'p',
-              null,
-              ' '
-            ),
-            React.createElement(
-              'button',
-              { className: 'btn btn-danger btn-block', onClick: this.dbRevoke },
-              'Revoke Dropbox Access'
-            )
+            this.state.dbToken ? React.createElement(DbLoggedIn, { dbSave: this.dbSave, dbRestore: this.dbRestore, dbRevoke: this.dbRevoke }) : React.createElement(DbLogin, { dbCode2Token: this.dbCode2Token })
           )
         ),
         React.createElement(
@@ -28852,6 +28797,87 @@ var Settings = React.createClass({
           { className: 'btn btn-danger btn-block', onClick: this.clearData },
           'Clear All Data'
         )
+      )
+    );
+  }
+});
+
+var DbLogin = React.createClass({
+  displayName: 'DbLogin',
+
+  dbGetCode: function dbGetCode() {
+    window.open('https://www.dropbox.com/oauth2/authorize?response_type=code&client_id=t7i1tds69yt0od4', 'Login To Dropbox');
+  },
+
+  dbCode2Token: function dbCode2Token(e) {
+    e.preventDefault();
+    this.props.dbCode2Token(this.refs.dbCode.value);
+    this.refs.dbForm.reset();
+  },
+
+  render: function render() {
+    return React.createElement(
+      'div',
+      null,
+      React.createElement(
+        'button',
+        { className: 'btn btn-primary btn-block', onClick: this.dbGetCode },
+        'Get Code'
+      ),
+      React.createElement(
+        'p',
+        null,
+        ' '
+      ),
+      React.createElement(
+        'form',
+        { className: 'form-inline', ref: 'dbForm', onSubmit: this.dbCode2Token },
+        React.createElement(
+          'div',
+          { className: 'form-group' },
+          React.createElement('input', { type: 'text', className: 'form-control', ref: 'dbCode', placeholder: 'Dropbox Code', size: '55' })
+        ),
+        React.createElement(
+          'button',
+          { type: 'submit', className: 'btn btn-default' },
+          'Link'
+        )
+      )
+    );
+  }
+});
+
+var DbLoggedIn = React.createClass({
+  displayName: 'DbLoggedIn',
+
+  render: function render() {
+    return React.createElement(
+      'div',
+      null,
+      React.createElement(
+        'button',
+        { className: 'btn btn-primary btn-block', onClick: this.props.dbSave },
+        'Save to Dropbox'
+      ),
+      React.createElement(
+        'p',
+        null,
+        ' '
+      ),
+      React.createElement(
+        'button',
+        { className: 'btn btn-primary btn-block', onClick: this.props.dbRestore },
+        'Restore from Dropbox'
+      ),
+      React.createElement(
+        'p',
+        null,
+        ' '
+      ),
+      React.createElement(
+        'button',
+        { className: 'btn btn-danger btn-block', onClick: this.props.dbRevoke },
+        'Revoke Dropbox Access'
       )
     );
   }
