@@ -732,7 +732,7 @@ var DbLoggedIn = React.createClass({
   render: function() {
     return (
       <div>
-        <p>Last Saved To Dropbox: {moment(this.props.dbLastSaved).calendar()}</p>
+        <p>Last Saved To Dropbox: {this.props.dbLastSaved ? moment(this.props.dbLastSaved).calendar() : 'Never Saved'}</p>
         <button className="btn btn-default btn-block" onClick={this.props.dbSave}>Save to Dropbox</button>
         <p>&nbsp;</p>
         {this.props.dbShowAdv ? <DbLoggedInAdv dbRestore={this.props.dbRestore} dbRevoke={this.props.dbRevoke} dbShowAdvChange={this.props.dbShowAdvChange} /> : <p><a href="#" onClick={this.showAdv}>Show Advanced Options</a></p> }

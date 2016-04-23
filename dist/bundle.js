@@ -28880,7 +28880,7 @@ var DbLoggedIn = React.createClass({
         'p',
         null,
         'Last Saved To Dropbox: ',
-        moment(this.props.dbLastSaved).calendar()
+        this.props.dbLastSaved ? moment(this.props.dbLastSaved).calendar() : 'Never Saved'
       ),
       React.createElement(
         'button',
