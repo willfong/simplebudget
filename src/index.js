@@ -436,7 +436,8 @@ var Settings = React.createClass({
       monthlyLog: {},
       newCatName: "",
       dbToken: false,
-      dbShowAdv: false
+      dbShowAdv: false,
+      dbLastSaved: ''
     };
   },
   
@@ -446,6 +447,15 @@ var Settings = React.createClass({
       this.state = JSON.parse(lsRef);
       this.state.newCatName = '';
       this.forceUpdate();
+      switch (this.state.language) {
+        case 'en':
+          moment.locale('en');
+          break;
+        case 'zh-tw':
+          require('moment/locale/zh-tw');
+          moment.locale('zh-tw');
+          break;
+      }
     }
   },
   
@@ -509,6 +519,8 @@ var Settings = React.createClass({
   dbSave: function(e) {
     e.preventDefault();
     if (confirm('Are you sure you want to save the current data to Dropbox?')) {
+      {/* TODO: put this date into the success handler */}
+      this.setState({dbLastSaved: moment()});
       var dbToken = this.state.dbToken;
       var dbData = localStorage.getItem('sbudget');
       var dbHeader = JSON.stringify({ "path": "/saveddata.txt", "mode": "overwrite", "autorename": true, "mute": false });
@@ -652,7 +664,7 @@ var Settings = React.createClass({
         <h3 className="panel-title">Backup To Dropbox</h3>
       </div>
       <div className="panel-body">
-        { this.state.dbToken ? <DbLoggedIn dbSave={this.dbSave} dbRestore={this.dbRestore} dbRevoke={this.dbRevoke} dbShowAdv={this.state.dbShowAdv} dbShowAdvChange={this.dbShowAdvChange} /> : <DbLogin dbCode2Token={this.dbCode2Token} /> }
+        { this.state.dbToken ? <DbLoggedIn dbSave={this.dbSave} dbRestore={this.dbRestore} dbRevoke={this.dbRevoke} dbLastSaved={this.state.dbLastSaved} dbShowAdv={this.state.dbShowAdv} dbShowAdvChange={this.dbShowAdvChange} /> : <DbLogin dbCode2Token={this.dbCode2Token} /> }
       </div>
     </div>
     <p>&nbsp;</p>
@@ -716,9 +728,11 @@ var DbLoggedIn = React.createClass({
     e.preventDefault();
     this.props.dbShowAdvChange();
   },
+  
   render: function() {
     return (
       <div>
+        <p>Last Saved To Dropbox: {moment(this.props.dbLastSaved).calendar()}</p>
         <button className="btn btn-default btn-block" onClick={this.props.dbSave}>Save to Dropbox</button>
         <p>&nbsp;</p>
         {this.props.dbShowAdv ? <DbLoggedInAdv dbRestore={this.props.dbRestore} dbRevoke={this.props.dbRevoke} dbShowAdvChange={this.props.dbShowAdvChange} /> : <p><a href="#" onClick={this.showAdv}>Show Advanced Options</a></p> }
