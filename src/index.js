@@ -1,4 +1,5 @@
 /*global localStorage*/
+/*global $*/
 
 var React = require('react');
 var ReactDOM = require('react-dom');
@@ -489,6 +490,80 @@ var Settings = React.createClass({
     }
   },
 
+  dropbox: function() {
+    window.open('https://www.dropbox.com/oauth2/authorize?response_type=code&client_id=t7i1tds69yt0od4', 'Login To Dropbox');
+  },
+
+  dbCode2Token: function(e) {
+    e.preventDefault();
+    var that = this;
+    {/* TODO: All this needs to be refactored to be, you know, secure */}
+    var dbToken = this.refs.dbCode.value;
+    $.post('https://api.dropboxapi.com/oauth2/token', {code: dbToken, grant_type: 'authorization_code', client_id: 't7i1tds69yt0od4', client_secret: '9fkqh566wx55lhq'}, function(data){
+      {/* TODO: This is where it's supposed to work... */}
+      that.refs.dbForm.reset();
+    }).error(function(data){
+      {/* TODO: Why does jQ think the response was an error? */}
+      localStorage.setItem('dbToken', JSON.parse(data.responseText).access_token);
+      that.refs.dbForm.reset();
+    });
+    
+  },
+ 
+  dbSave: function(e) {
+    e.preventDefault();
+    var dbToken = localStorage.getItem('dbToken');
+    var dbData = localStorage.getItem('sbudget');
+    var dbHeader = JSON.stringify({ "path": "/saveddata.txt", "mode": "overwrite", "autorename": true, "mute": false });
+    $.ajax({
+      type: 'POST',
+      url: 'https://content.dropboxapi.com/2/files/upload',
+      headers: {
+        'Authorization': 'Bearer ' + dbToken,
+        "Dropbox-API-Arg": dbHeader
+      },
+      contentType: "application/octet-stream",
+      data: dbData
+    }).done(function(data){console.log(data);}).fail(function(data){ console.log(data);});
+  },
+ 
+  dbRestore: function(e) {
+    e.preventDefault();
+    var that = this;
+    var dbToken = localStorage.getItem('dbToken');
+    var dbHeader = JSON.stringify({ "path": "/saveddata.txt" });
+    $.ajax({
+      type: 'POST',
+      url: 'https://content.dropboxapi.com/2/files/download',
+      headers: {
+        'Authorization': 'Bearer ' + dbToken,
+        "Dropbox-API-Arg": dbHeader
+      }
+    }).done(function(data) {
+      {/* TODO: This seems a little fragile. */}
+      that.state = JSON.parse(data);
+      that.state.newCatName = '';
+      that.forceUpdate();
+    }).fail(function(data) {
+      console.log(data);
+    });
+  },
+  
+  dbRevoke: function(e) {
+    e.preventDefault();
+    var dbToken = localStorage.getItem('dbToken');
+    $.ajax({
+      type: 'POST',
+      url: 'https://api.dropboxapi.com/2/auth/token/revoke',
+      headers: {
+        'Authorization': 'Bearer ' + dbToken
+      }
+    }).done(function(data){
+      console.log(data);
+      localStorage.getItem('dbToken');
+    });
+  },
+ 
   enableBtnNewCat: function(e) {
     this.setState({newCatName: e.target.value});
   },
@@ -566,6 +641,26 @@ var Settings = React.createClass({
     <p>&nbsp;</p>
     <div className="panel panel-default">
       <div className="panel-heading">
+        <h3 className="panel-title">Backup To Dropbox</h3>
+      </div>
+      <div className="panel-body">
+        <button className="btn btn-primary btn-block" onClick={this.dropbox}>Get Code</button>
+        <p>&nbsp;</p>
+        <form className="form-inline" ref="dbForm" onSubmit={this.dbCode2Token}>
+          <div className="form-group">
+            <input type="text" className="form-control" ref="dbCode" placeholder="Dropbox Code" size="55"/>
+          </div>
+          <button type="submit" className="btn btn-default">Link</button>
+        </form>
+        <button className="btn btn-primary btn-block" onClick={this.dbSave}>Save to Dropbox</button>
+        <button className="btn btn-primary btn-block" onClick={this.dbRestore}>Restore from Dropbox</button>
+        <p>&nbsp;</p>
+        <button className="btn btn-danger btn-block" onClick={this.dbRevoke}>Revoke Dropbox Access</button>
+      </div>
+    </div>
+    <p>&nbsp;</p>
+    <div className="panel panel-default">
+      <div className="panel-heading">
         <h3 className="panel-title">Manual Spending Entry</h3>
       </div>
       <div className="panel-body">
@@ -584,6 +679,7 @@ var Settings = React.createClass({
       </div>
     </div>    
     <p>&nbsp;</p>
+    
     <button className="btn btn-danger btn-block" onClick={this.clearData}>Clear All Data</button>
   </div>
 </div>
