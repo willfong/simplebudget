@@ -719,7 +719,7 @@ var DbLoggedIn = React.createClass({
   render: function() {
     return (
       <div>
-        <button className="btn btn-primary btn-block" onClick={this.props.dbSave}>Save to Dropbox</button>
+        <button className="btn btn-default btn-block" onClick={this.props.dbSave}>Save to Dropbox</button>
         <p>&nbsp;</p>
         {this.props.dbShowAdv ? <DbLoggedInAdv dbRestore={this.props.dbRestore} dbRevoke={this.props.dbRevoke} dbShowAdvChange={this.props.dbShowAdvChange} /> : <p><a href="#" onClick={this.showAdv}>Show Advanced Options</a></p> }
       </div>
@@ -738,7 +738,7 @@ var DbLoggedInAdv = React.createClass({
         <p><a href="#" onClick={this.showAdv}>Hide</a></p>
         <p>These are advanced features that you generally don't need.</p>
         <p>&nbsp;</p>
-        <button className="btn btn-primary btn-block" onClick={this.props.dbRestore}>Restore from Dropbox</button>
+        <button className="btn btn-default btn-block" onClick={this.props.dbRestore}>Restore from Dropbox</button>
         <p>&nbsp;</p>
         <button className="btn btn-danger btn-block" onClick={this.props.dbRevoke}>Revoke Dropbox Access</button>
       </div>

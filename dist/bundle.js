@@ -28865,7 +28865,7 @@ var DbLoggedIn = React.createClass({
       null,
       React.createElement(
         'button',
-        { className: 'btn btn-primary btn-block', onClick: this.props.dbSave },
+        { className: 'btn btn-default btn-block', onClick: this.props.dbSave },
         'Save to Dropbox'
       ),
       React.createElement(
@@ -28918,7 +28918,7 @@ var DbLoggedInAdv = React.createClass({
       ),
       React.createElement(
         'button',
-        { className: 'btn btn-primary btn-block', onClick: this.props.dbRestore },
+        { className: 'btn btn-default btn-block', onClick: this.props.dbRestore },
         'Restore from Dropbox'
       ),
       React.createElement(
