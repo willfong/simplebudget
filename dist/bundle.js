@@ -28453,7 +28453,8 @@ var Settings = React.createClass({
       categories: [],
       monthlyTotals: {},
       monthlyLog: {},
-      newCatName: ""
+      newCatName: "",
+      dbToken: ''
     };
   },
 
@@ -28533,67 +28534,76 @@ var Settings = React.createClass({
       that.refs.dbForm.reset();
     }).error(function (data) {
       {/* TODO: Why does jQ think the response was an error? */}
-      localStorage.setItem('dbToken', JSON.parse(data.responseText).access_token);
+      var token = JSON.parse(data.responseText).access_token;
+      that.state.dbToken = token;
+      that.setState({ dbToken: token });
       that.refs.dbForm.reset();
     });
   },
 
   dbSave: function dbSave(e) {
     e.preventDefault();
-    var dbToken = localStorage.getItem('dbToken');
-    var dbData = localStorage.getItem('sbudget');
-    var dbHeader = JSON.stringify({ "path": "/saveddata.txt", "mode": "overwrite", "autorename": true, "mute": false });
-    $.ajax({
-      type: 'POST',
-      url: 'https://content.dropboxapi.com/2/files/upload',
-      headers: {
-        'Authorization': 'Bearer ' + dbToken,
-        "Dropbox-API-Arg": dbHeader
-      },
-      contentType: "application/octet-stream",
-      data: dbData
-    }).done(function (data) {
-      console.log(data);
-    }).fail(function (data) {
-      console.log(data);
-    });
+    if (confirm('Are you sure you want to save the current data to Dropbox?')) {
+      var dbToken = this.state.dbToken;
+      var dbData = localStorage.getItem('sbudget');
+      var dbHeader = JSON.stringify({ "path": "/saveddata.txt", "mode": "overwrite", "autorename": true, "mute": false });
+      $.ajax({
+        type: 'POST',
+        url: 'https://content.dropboxapi.com/2/files/upload',
+        headers: {
+          'Authorization': 'Bearer ' + dbToken,
+          "Dropbox-API-Arg": dbHeader
+        },
+        contentType: "application/octet-stream",
+        data: dbData
+      }).done(function (data) {
+        console.log(data);
+      }).fail(function (data) {
+        console.log(data);
+      });
+    }
   },
 
   dbRestore: function dbRestore(e) {
     e.preventDefault();
-    var that = this;
-    var dbToken = localStorage.getItem('dbToken');
-    var dbHeader = JSON.stringify({ "path": "/saveddata.txt" });
-    $.ajax({
-      type: 'POST',
-      url: 'https://content.dropboxapi.com/2/files/download',
-      headers: {
-        'Authorization': 'Bearer ' + dbToken,
-        "Dropbox-API-Arg": dbHeader
-      }
-    }).done(function (data) {
-      {/* TODO: This seems a little fragile. */}
-      that.state = JSON.parse(data);
-      that.state.newCatName = '';
-      that.forceUpdate();
-    }).fail(function (data) {
-      console.log(data);
-    });
+    if (confirm('Are you sure you want to load data from Dropbox to here?')) {
+      var that = this;
+      var dbToken = this.state.dbToken;
+      var dbHeader = JSON.stringify({ "path": "/saveddata.txt" });
+      $.ajax({
+        type: 'POST',
+        url: 'https://content.dropboxapi.com/2/files/download',
+        headers: {
+          'Authorization': 'Bearer ' + dbToken,
+          "Dropbox-API-Arg": dbHeader
+        }
+      }).done(function (data) {
+        {/* TODO: This seems a little fragile. */}
+        that.state = JSON.parse(data);
+        that.state.dbToken = dbToken;
+        that.state.newCatName = '';
+        that.forceUpdate();
+      }).fail(function (data) {
+        console.log(data);
+      });
+    }
   },
 
   dbRevoke: function dbRevoke(e) {
     e.preventDefault();
-    var dbToken = localStorage.getItem('dbToken');
-    $.ajax({
-      type: 'POST',
-      url: 'https://api.dropboxapi.com/2/auth/token/revoke',
-      headers: {
-        'Authorization': 'Bearer ' + dbToken
-      }
-    }).done(function (data) {
-      console.log(data);
-      localStorage.getItem('dbToken');
-    });
+    if (confirm('Are you sure you want to revoke access to Dropbox?')) {
+      var dbToken = this.state.dbToken;
+      $.ajax({
+        type: 'POST',
+        url: 'https://api.dropboxapi.com/2/auth/token/revoke',
+        headers: {
+          'Authorization': 'Bearer ' + dbToken
+        }
+      }).done(function (data) {
+        this.state.dbToken = '';
+        this.setState({ dbToken: '' });
+      });
+    }
   },
 
   enableBtnNewCat: function enableBtnNewCat(e) {
@@ -28759,6 +28769,11 @@ var Settings = React.createClass({
               'button',
               { className: 'btn btn-primary btn-block', onClick: this.dbSave },
               'Save to Dropbox'
+            ),
+            React.createElement(
+              'p',
+              null,
+              ' '
             ),
             React.createElement(
               'button',
