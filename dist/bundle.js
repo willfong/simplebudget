@@ -28454,7 +28454,8 @@ var Settings = React.createClass({
       monthlyTotals: {},
       monthlyLog: {},
       newCatName: "",
-      dbToken: false
+      dbToken: false,
+      dbShowAdv: false
     };
   },
 
@@ -28599,6 +28600,10 @@ var Settings = React.createClass({
     }
   },
 
+  dbShowAdvChange: function dbShowAdvChange() {
+    this.setState({ dbShowAdv: !this.state.dbShowAdv });
+  },
+
   enableBtnNewCat: function enableBtnNewCat(e) {
     this.setState({ newCatName: e.target.value });
   },
@@ -28734,7 +28739,7 @@ var Settings = React.createClass({
           React.createElement(
             'div',
             { className: 'panel-body' },
-            this.state.dbToken ? React.createElement(DbLoggedIn, { dbSave: this.dbSave, dbRestore: this.dbRestore, dbRevoke: this.dbRevoke }) : React.createElement(DbLogin, { dbCode2Token: this.dbCode2Token })
+            this.state.dbToken ? React.createElement(DbLoggedIn, { dbSave: this.dbSave, dbRestore: this.dbRestore, dbRevoke: this.dbRevoke, dbShowAdv: this.state.dbShowAdv, dbShowAdvChange: this.dbShowAdvChange }) : React.createElement(DbLogin, { dbCode2Token: this.dbCode2Token })
           )
         ),
         React.createElement(
@@ -28850,6 +28855,10 @@ var DbLogin = React.createClass({
 var DbLoggedIn = React.createClass({
   displayName: 'DbLoggedIn',
 
+  showAdv: function showAdv(e) {
+    e.preventDefault();
+    this.props.dbShowAdvChange();
+  },
   render: function render() {
     return React.createElement(
       'div',
@@ -28858,6 +28867,49 @@ var DbLoggedIn = React.createClass({
         'button',
         { className: 'btn btn-primary btn-block', onClick: this.props.dbSave },
         'Save to Dropbox'
+      ),
+      React.createElement(
+        'p',
+        null,
+        ' '
+      ),
+      this.props.dbShowAdv ? React.createElement(DbLoggedInAdv, { dbRestore: this.props.dbRestore, dbRevoke: this.props.dbRevoke, dbShowAdvChange: this.props.dbShowAdvChange }) : React.createElement(
+        'p',
+        null,
+        React.createElement(
+          'a',
+          { href: '#', onClick: this.showAdv },
+          'Show Advanced Options'
+        )
+      )
+    );
+  }
+});
+
+var DbLoggedInAdv = React.createClass({
+  displayName: 'DbLoggedInAdv',
+
+  showAdv: function showAdv(e) {
+    e.preventDefault();
+    this.props.dbShowAdvChange();
+  },
+  render: function render() {
+    return React.createElement(
+      'div',
+      { className: 'well well-lg' },
+      React.createElement(
+        'p',
+        null,
+        React.createElement(
+          'a',
+          { href: '#', onClick: this.showAdv },
+          'Hide'
+        )
+      ),
+      React.createElement(
+        'p',
+        null,
+        'These are advanced features that you generally don\'t need.'
       ),
       React.createElement(
         'p',

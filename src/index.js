@@ -435,7 +435,8 @@ var Settings = React.createClass({
       monthlyTotals: {},
       monthlyLog: {},
       newCatName: "",
-      dbToken: false
+      dbToken: false,
+      dbShowAdv: false
     };
   },
   
@@ -567,6 +568,10 @@ var Settings = React.createClass({
     }
   },
  
+  dbShowAdvChange: function() {
+    this.setState({dbShowAdv: !this.state.dbShowAdv});
+  },
+ 
   enableBtnNewCat: function(e) {
     this.setState({newCatName: e.target.value});
   },
@@ -647,7 +652,7 @@ var Settings = React.createClass({
         <h3 className="panel-title">Backup To Dropbox</h3>
       </div>
       <div className="panel-body">
-        { this.state.dbToken ? <DbLoggedIn dbSave={this.dbSave} dbRestore={this.dbRestore} dbRevoke={this.dbRevoke}/> : <DbLogin dbCode2Token={this.dbCode2Token}/> }
+        { this.state.dbToken ? <DbLoggedIn dbSave={this.dbSave} dbRestore={this.dbRestore} dbRevoke={this.dbRevoke} dbShowAdv={this.state.dbShowAdv} dbShowAdvChange={this.dbShowAdvChange} /> : <DbLogin dbCode2Token={this.dbCode2Token} /> }
       </div>
     </div>
     <p>&nbsp;</p>
@@ -707,10 +712,31 @@ var DbLogin = React.createClass({
 });
 
 var DbLoggedIn = React.createClass({
+  showAdv: function(e) {
+    e.preventDefault();
+    this.props.dbShowAdvChange();
+  },
   render: function() {
     return (
       <div>
         <button className="btn btn-primary btn-block" onClick={this.props.dbSave}>Save to Dropbox</button>
+        <p>&nbsp;</p>
+        {this.props.dbShowAdv ? <DbLoggedInAdv dbRestore={this.props.dbRestore} dbRevoke={this.props.dbRevoke} dbShowAdvChange={this.props.dbShowAdvChange} /> : <p><a href="#" onClick={this.showAdv}>Show Advanced Options</a></p> }
+      </div>
+    );
+  }
+});
+
+var DbLoggedInAdv = React.createClass({
+  showAdv: function(e) {
+    e.preventDefault();
+    this.props.dbShowAdvChange();
+  },
+  render: function() {
+    return (
+      <div className="well well-lg">
+        <p><a href="#" onClick={this.showAdv}>Hide</a></p>
+        <p>These are advanced features that you generally don't need.</p>
         <p>&nbsp;</p>
         <button className="btn btn-primary btn-block" onClick={this.props.dbRestore}>Restore from Dropbox</button>
         <p>&nbsp;</p>
