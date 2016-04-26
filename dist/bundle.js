@@ -227,15 +227,15 @@ process.umask = function() { return 0; };
             future : '%s內',
             past : '%s前',
             s : '幾秒',
-            m : '一分鐘',
+            m : '1分鐘',
             mm : '%d分鐘',
-            h : '一小時',
+            h : '1小時',
             hh : '%d小時',
-            d : '一天',
+            d : '1天',
             dd : '%d天',
-            M : '一個月',
+            M : '1個月',
             MM : '%d個月',
-            y : '一年',
+            y : '1年',
             yy : '%d年'
         }
     });
@@ -245,7 +245,7 @@ process.umask = function() { return 0; };
 }));
 },{"../moment":4}],4:[function(require,module,exports){
 //! moment.js
-//! version : 2.12.0
+//! version : 2.13.0
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
 //! license : MIT
 //! momentjs.com
@@ -322,7 +322,9 @@ process.umask = function() { return 0; };
             invalidMonth    : null,
             invalidFormat   : false,
             userInvalidated : false,
-            iso             : false
+            iso             : false,
+            parsedDateParts : [],
+            meridiem        : null
         };
     }
 
@@ -333,9 +335,30 @@ process.umask = function() { return 0; };
         return m._pf;
     }
 
+    var some;
+    if (Array.prototype.some) {
+        some = Array.prototype.some;
+    } else {
+        some = function (fun) {
+            var t = Object(this);
+            var len = t.length >>> 0;
+
+            for (var i = 0; i < len; i++) {
+                if (i in t && fun.call(this, t[i], i, t)) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+    }
+
     function valid__isValid(m) {
         if (m._isValid == null) {
             var flags = getParsingFlags(m);
+            var parsedParts = some.call(flags.parsedDateParts, function (i) {
+                return i != null;
+            });
             m._isValid = !isNaN(m._d.getTime()) &&
                 flags.overflow < 0 &&
                 !flags.empty &&
@@ -343,7 +366,8 @@ process.umask = function() { return 0; };
                 !flags.invalidWeekday &&
                 !flags.nullInput &&
                 !flags.invalidFormat &&
-                !flags.userInvalidated;
+                !flags.userInvalidated &&
+                (!flags.meridiem || (flags.meridiem && parsedParts));
 
             if (m._strict) {
                 m._isValid = m._isValid &&
@@ -486,6 +510,9 @@ process.umask = function() { return 0; };
         var firstTime = true;
 
         return extend(function () {
+            if (utils_hooks__hooks.deprecationHandler != null) {
+                utils_hooks__hooks.deprecationHandler(null, msg);
+            }
             if (firstTime) {
                 warn(msg + '\nArguments: ' + Array.prototype.slice.call(arguments).join(', ') + '\n' + (new Error()).stack);
                 firstTime = false;
@@ -497,6 +524,9 @@ process.umask = function() { return 0; };
     var deprecations = {};
 
     function deprecateSimple(name, msg) {
+        if (utils_hooks__hooks.deprecationHandler != null) {
+            utils_hooks__hooks.deprecationHandler(name, msg);
+        }
         if (!deprecations[name]) {
             warn(msg);
             deprecations[name] = true;
@@ -504,6 +534,7 @@ process.umask = function() { return 0; };
     }
 
     utils_hooks__hooks.suppressDeprecationWarnings = false;
+    utils_hooks__hooks.deprecationHandler = null;
 
     function isFunction(input) {
         return input instanceof Function || Object.prototype.toString.call(input) === '[object Function]';
@@ -551,6 +582,22 @@ process.umask = function() { return 0; };
         if (config != null) {
             this.set(config);
         }
+    }
+
+    var keys;
+
+    if (Object.keys) {
+        keys = Object.keys;
+    } else {
+        keys = function (obj) {
+            var i, res = [];
+            for (i in obj) {
+                if (hasOwnProp(obj, i)) {
+                    res.push(i);
+                }
+            }
+            return res;
+        };
     }
 
     // internal storage for locale config files
@@ -707,7 +754,7 @@ process.umask = function() { return 0; };
     }
 
     function locale_locales__listLocales() {
-        return Object.keys(locales);
+        return keys(locales);
     }
 
     var aliases = {};
@@ -786,7 +833,7 @@ process.umask = function() { return 0; };
             Math.pow(10, Math.max(0, zerosToFill)).toString().substr(1) + absNumber;
     }
 
-    var formattingTokens = /(\[[^\[]*\])|(\\)?([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|.)/g;
+    var formattingTokens = /(\[[^\[]*\])|(\\)?([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|.)/g;
 
     var localFormattingTokens = /(\[[^\[]*\])|(\\)?(LTS|LT|LL?L?L?|l{1,4})/g;
 
@@ -839,7 +886,7 @@ process.umask = function() { return 0; };
         }
 
         return function (mom) {
-            var output = '';
+            var output = '', i;
             for (i = 0; i < length; i++) {
                 output += array[i] instanceof Function ? array[i].call(mom, format) : array[i];
             }
@@ -968,6 +1015,23 @@ process.umask = function() { return 0; };
     var WEEK = 7;
     var WEEKDAY = 8;
 
+    var indexOf;
+
+    if (Array.prototype.indexOf) {
+        indexOf = Array.prototype.indexOf;
+    } else {
+        indexOf = function (o) {
+            // I know
+            var i;
+            for (i = 0; i < this.length; ++i) {
+                if (this[i] === o) {
+                    return i;
+                }
+            }
+            return -1;
+        };
+    }
+
     function daysInMonth(year, month) {
         return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
     }
@@ -1030,8 +1094,53 @@ process.umask = function() { return 0; };
             this._monthsShort[MONTHS_IN_FORMAT.test(format) ? 'format' : 'standalone'][m.month()];
     }
 
+    function units_month__handleStrictParse(monthName, format, strict) {
+        var i, ii, mom, llc = monthName.toLocaleLowerCase();
+        if (!this._monthsParse) {
+            // this is not used
+            this._monthsParse = [];
+            this._longMonthsParse = [];
+            this._shortMonthsParse = [];
+            for (i = 0; i < 12; ++i) {
+                mom = create_utc__createUTC([2000, i]);
+                this._shortMonthsParse[i] = this.monthsShort(mom, '').toLocaleLowerCase();
+                this._longMonthsParse[i] = this.months(mom, '').toLocaleLowerCase();
+            }
+        }
+
+        if (strict) {
+            if (format === 'MMM') {
+                ii = indexOf.call(this._shortMonthsParse, llc);
+                return ii !== -1 ? ii : null;
+            } else {
+                ii = indexOf.call(this._longMonthsParse, llc);
+                return ii !== -1 ? ii : null;
+            }
+        } else {
+            if (format === 'MMM') {
+                ii = indexOf.call(this._shortMonthsParse, llc);
+                if (ii !== -1) {
+                    return ii;
+                }
+                ii = indexOf.call(this._longMonthsParse, llc);
+                return ii !== -1 ? ii : null;
+            } else {
+                ii = indexOf.call(this._longMonthsParse, llc);
+                if (ii !== -1) {
+                    return ii;
+                }
+                ii = indexOf.call(this._shortMonthsParse, llc);
+                return ii !== -1 ? ii : null;
+            }
+        }
+    }
+
     function localeMonthsParse (monthName, format, strict) {
         var i, mom, regex;
+
+        if (this._monthsParseExact) {
+            return units_month__handleStrictParse.call(this, monthName, format, strict);
+        }
 
         if (!this._monthsParse) {
             this._monthsParse = [];
@@ -1039,6 +1148,9 @@ process.umask = function() { return 0; };
             this._shortMonthsParse = [];
         }
 
+        // TODO: add sorting
+        // Sorting makes sure if one month (or abbr) is a prefix of another
+        // see sorting in computeMonthsParse
         for (i = 0; i < 12; i++) {
             // make the regex if we don't have it already
             mom = create_utc__createUTC([2000, i]);
@@ -1164,8 +1276,8 @@ process.umask = function() { return 0; };
 
         this._monthsRegex = new RegExp('^(' + mixedPieces.join('|') + ')', 'i');
         this._monthsShortRegex = this._monthsRegex;
-        this._monthsStrictRegex = new RegExp('^(' + longPieces.join('|') + ')$', 'i');
-        this._monthsShortStrictRegex = new RegExp('^(' + shortPieces.join('|') + ')$', 'i');
+        this._monthsStrictRegex = new RegExp('^(' + longPieces.join('|') + ')', 'i');
+        this._monthsShortStrictRegex = new RegExp('^(' + shortPieces.join('|') + ')', 'i');
     }
 
     function checkOverflow (m) {
@@ -1392,7 +1504,7 @@ process.umask = function() { return 0; };
 
     // MOMENTS
 
-    var getSetYear = makeGetSet('FullYear', false);
+    var getSetYear = makeGetSet('FullYear', true);
 
     function getIsLeapYear () {
         return isLeapYear(this.year());
@@ -1661,6 +1773,9 @@ process.umask = function() { return 0; };
                 config._a[HOUR] > 0) {
             getParsingFlags(config).bigHour = undefined;
         }
+
+        getParsingFlags(config).parsedDateParts = config._a.slice(0);
+        getParsingFlags(config).meridiem = config._meridiem;
         // handle meridiem
         config._a[HOUR] = meridiemFixWrap(config._locale, config._a[HOUR], config._meridiem);
 
@@ -1801,7 +1916,7 @@ process.umask = function() { return 0; };
         if (input === undefined) {
             config._d = new Date(utils_hooks__hooks.now());
         } else if (isDate(input)) {
-            config._d = new Date(+input);
+            config._d = new Date(input.valueOf());
         } else if (typeof input === 'string') {
             configFromString(config);
         } else if (isArray(input)) {
@@ -1921,7 +2036,7 @@ process.umask = function() { return 0; };
         this._milliseconds = +milliseconds +
             seconds * 1e3 + // 1000
             minutes * 6e4 + // 1000 * 60
-            hours * 36e5; // 1000 * 60 * 60
+            hours * 1000 * 60 * 60; //using 1000 * 60 * 60 instead of 36e5 to avoid floating point rounding errors https://github.com/moment/moment/issues/2978
         // Because of dateAddRemove treats 24 hours as different from a
         // day when working around DST, we need to store them separately
         this._days = +days +
@@ -1991,9 +2106,9 @@ process.umask = function() { return 0; };
         var res, diff;
         if (model._isUTC) {
             res = model.clone();
-            diff = (isMoment(input) || isDate(input) ? +input : +local__createLocal(input)) - (+res);
+            diff = (isMoment(input) || isDate(input) ? input.valueOf() : local__createLocal(input).valueOf()) - res.valueOf();
             // Use low-level api, because this fn is low-level api.
-            res._d.setTime(+res._d + diff);
+            res._d.setTime(res._d.valueOf() + diff);
             utils_hooks__hooks.updateOffset(res, false);
             return res;
         } else {
@@ -2154,7 +2269,7 @@ process.umask = function() { return 0; };
     // from http://docs.closure-library.googlecode.com/git/closure_goog_date_date.js.source.html
     // somewhat more in line with 4.4.3.2 2004 spec, but allows decimal anywhere
     // and further modified to allow for strings containing both week and day
-    var isoRegex = /^(-)?P(?:([0-9,.]*)Y)?(?:([0-9,.]*)M)?(?:([0-9,.]*)W)?(?:([0-9,.]*)D)?(?:T(?:([0-9,.]*)H)?(?:([0-9,.]*)M)?(?:([0-9,.]*)S)?)?$/;
+    var isoRegex = /^(-)?P(?:(-?[0-9,.]*)Y)?(?:(-?[0-9,.]*)M)?(?:(-?[0-9,.]*)W)?(?:(-?[0-9,.]*)D)?(?:T(?:(-?[0-9,.]*)H)?(?:(-?[0-9,.]*)M)?(?:(-?[0-9,.]*)S)?)?$/;
 
     function create__createDuration (input, key) {
         var duration = input,
@@ -2298,7 +2413,7 @@ process.umask = function() { return 0; };
         updateOffset = updateOffset == null ? true : updateOffset;
 
         if (milliseconds) {
-            mom._d.setTime(+mom._d + milliseconds * isAdding);
+            mom._d.setTime(mom._d.valueOf() + milliseconds * isAdding);
         }
         if (days) {
             get_set__set(mom, 'Date', get_set__get(mom, 'Date') + days * isAdding);
@@ -2343,9 +2458,9 @@ process.umask = function() { return 0; };
         }
         units = normalizeUnits(!isUndefined(units) ? units : 'millisecond');
         if (units === 'millisecond') {
-            return +this > +localInput;
+            return this.valueOf() > localInput.valueOf();
         } else {
-            return +localInput < +this.clone().startOf(units);
+            return localInput.valueOf() < this.clone().startOf(units).valueOf();
         }
     }
 
@@ -2356,14 +2471,16 @@ process.umask = function() { return 0; };
         }
         units = normalizeUnits(!isUndefined(units) ? units : 'millisecond');
         if (units === 'millisecond') {
-            return +this < +localInput;
+            return this.valueOf() < localInput.valueOf();
         } else {
-            return +this.clone().endOf(units) < +localInput;
+            return this.clone().endOf(units).valueOf() < localInput.valueOf();
         }
     }
 
-    function isBetween (from, to, units) {
-        return this.isAfter(from, units) && this.isBefore(to, units);
+    function isBetween (from, to, units, inclusivity) {
+        inclusivity = inclusivity || '()';
+        return (inclusivity[0] === '(' ? this.isAfter(from, units) : !this.isBefore(from, units)) &&
+            (inclusivity[1] === ')' ? this.isBefore(to, units) : !this.isAfter(to, units));
     }
 
     function isSame (input, units) {
@@ -2374,10 +2491,10 @@ process.umask = function() { return 0; };
         }
         units = normalizeUnits(units || 'millisecond');
         if (units === 'millisecond') {
-            return +this === +localInput;
+            return this.valueOf() === localInput.valueOf();
         } else {
-            inputMs = +localInput;
-            return +(this.clone().startOf(units)) <= inputMs && inputMs <= +(this.clone().endOf(units));
+            inputMs = localInput.valueOf();
+            return this.clone().startOf(units).valueOf() <= inputMs && inputMs <= this.clone().endOf(units).valueOf();
         }
     }
 
@@ -2444,10 +2561,12 @@ process.umask = function() { return 0; };
             adjust = (b - anchor) / (anchor2 - anchor);
         }
 
-        return -(wholeMonthDiff + adjust);
+        //check for negative zero, return zero if negative zero
+        return -(wholeMonthDiff + adjust) || 0;
     }
 
     utils_hooks__hooks.defaultFormat = 'YYYY-MM-DDTHH:mm:ssZ';
+    utils_hooks__hooks.defaultFormatUtc = 'YYYY-MM-DDTHH:mm:ss[Z]';
 
     function toString () {
         return this.clone().locale('en').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
@@ -2468,7 +2587,10 @@ process.umask = function() { return 0; };
     }
 
     function format (inputString) {
-        var output = formatMoment(this, inputString || utils_hooks__hooks.defaultFormat);
+        if (!inputString) {
+            inputString = this.isUtc() ? utils_hooks__hooks.defaultFormatUtc : utils_hooks__hooks.defaultFormat;
+        }
+        var output = formatMoment(this, inputString);
         return this.localeData().postformat(output);
     }
 
@@ -2547,6 +2669,7 @@ process.umask = function() { return 0; };
         case 'week':
         case 'isoWeek':
         case 'day':
+        case 'date':
             this.hours(0);
             /* falls through */
         case 'hour':
@@ -2580,19 +2703,25 @@ process.umask = function() { return 0; };
         if (units === undefined || units === 'millisecond') {
             return this;
         }
+
+        // 'date' is an alias for 'day', so it should be considered as such.
+        if (units === 'date') {
+            units = 'day';
+        }
+
         return this.startOf(units).add(1, (units === 'isoWeek' ? 'week' : units)).subtract(1, 'ms');
     }
 
     function to_type__valueOf () {
-        return +this._d - ((this._offset || 0) * 60000);
+        return this._d.valueOf() - ((this._offset || 0) * 60000);
     }
 
     function unix () {
-        return Math.floor(+this / 1000);
+        return Math.floor(this.valueOf() / 1000);
     }
 
     function toDate () {
-        return this._offset ? new Date(+this) : this._d;
+        return this._offset ? new Date(this.valueOf()) : this._d;
     }
 
     function toArray () {
@@ -2861,9 +2990,15 @@ process.umask = function() { return 0; };
     addRegexToken('d',    match1to2);
     addRegexToken('e',    match1to2);
     addRegexToken('E',    match1to2);
-    addRegexToken('dd',   matchWord);
-    addRegexToken('ddd',  matchWord);
-    addRegexToken('dddd', matchWord);
+    addRegexToken('dd',   function (isStrict, locale) {
+        return locale.weekdaysMinRegex(isStrict);
+    });
+    addRegexToken('ddd',   function (isStrict, locale) {
+        return locale.weekdaysShortRegex(isStrict);
+    });
+    addRegexToken('dddd',   function (isStrict, locale) {
+        return locale.weekdaysRegex(isStrict);
+    });
 
     addWeekParseToken(['dd', 'ddd', 'dddd'], function (input, week, config, token) {
         var weekday = config._locale.weekdaysParse(input, token, config._strict);
@@ -2916,8 +3051,76 @@ process.umask = function() { return 0; };
         return this._weekdaysMin[m.day()];
     }
 
+    function day_of_week__handleStrictParse(weekdayName, format, strict) {
+        var i, ii, mom, llc = weekdayName.toLocaleLowerCase();
+        if (!this._weekdaysParse) {
+            this._weekdaysParse = [];
+            this._shortWeekdaysParse = [];
+            this._minWeekdaysParse = [];
+
+            for (i = 0; i < 7; ++i) {
+                mom = create_utc__createUTC([2000, 1]).day(i);
+                this._minWeekdaysParse[i] = this.weekdaysMin(mom, '').toLocaleLowerCase();
+                this._shortWeekdaysParse[i] = this.weekdaysShort(mom, '').toLocaleLowerCase();
+                this._weekdaysParse[i] = this.weekdays(mom, '').toLocaleLowerCase();
+            }
+        }
+
+        if (strict) {
+            if (format === 'dddd') {
+                ii = indexOf.call(this._weekdaysParse, llc);
+                return ii !== -1 ? ii : null;
+            } else if (format === 'ddd') {
+                ii = indexOf.call(this._shortWeekdaysParse, llc);
+                return ii !== -1 ? ii : null;
+            } else {
+                ii = indexOf.call(this._minWeekdaysParse, llc);
+                return ii !== -1 ? ii : null;
+            }
+        } else {
+            if (format === 'dddd') {
+                ii = indexOf.call(this._weekdaysParse, llc);
+                if (ii !== -1) {
+                    return ii;
+                }
+                ii = indexOf.call(this._shortWeekdaysParse, llc);
+                if (ii !== -1) {
+                    return ii;
+                }
+                ii = indexOf.call(this._minWeekdaysParse, llc);
+                return ii !== -1 ? ii : null;
+            } else if (format === 'ddd') {
+                ii = indexOf.call(this._shortWeekdaysParse, llc);
+                if (ii !== -1) {
+                    return ii;
+                }
+                ii = indexOf.call(this._weekdaysParse, llc);
+                if (ii !== -1) {
+                    return ii;
+                }
+                ii = indexOf.call(this._minWeekdaysParse, llc);
+                return ii !== -1 ? ii : null;
+            } else {
+                ii = indexOf.call(this._minWeekdaysParse, llc);
+                if (ii !== -1) {
+                    return ii;
+                }
+                ii = indexOf.call(this._weekdaysParse, llc);
+                if (ii !== -1) {
+                    return ii;
+                }
+                ii = indexOf.call(this._shortWeekdaysParse, llc);
+                return ii !== -1 ? ii : null;
+            }
+        }
+    }
+
     function localeWeekdaysParse (weekdayName, format, strict) {
         var i, mom, regex;
+
+        if (this._weekdaysParseExact) {
+            return day_of_week__handleStrictParse.call(this, weekdayName, format, strict);
+        }
 
         if (!this._weekdaysParse) {
             this._weekdaysParse = [];
@@ -2929,7 +3132,7 @@ process.umask = function() { return 0; };
         for (i = 0; i < 7; i++) {
             // make the regex if we don't have it already
 
-            mom = local__createLocal([2000, 1]).day(i);
+            mom = create_utc__createUTC([2000, 1]).day(i);
             if (strict && !this._fullWeekdaysParse[i]) {
                 this._fullWeekdaysParse[i] = new RegExp('^' + this.weekdays(mom, '').replace('.', '\.?') + '$', 'i');
                 this._shortWeekdaysParse[i] = new RegExp('^' + this.weekdaysShort(mom, '').replace('.', '\.?') + '$', 'i');
@@ -2985,6 +3188,99 @@ process.umask = function() { return 0; };
         return input == null ? this.day() || 7 : this.day(this.day() % 7 ? input : input - 7);
     }
 
+    var defaultWeekdaysRegex = matchWord;
+    function weekdaysRegex (isStrict) {
+        if (this._weekdaysParseExact) {
+            if (!hasOwnProp(this, '_weekdaysRegex')) {
+                computeWeekdaysParse.call(this);
+            }
+            if (isStrict) {
+                return this._weekdaysStrictRegex;
+            } else {
+                return this._weekdaysRegex;
+            }
+        } else {
+            return this._weekdaysStrictRegex && isStrict ?
+                this._weekdaysStrictRegex : this._weekdaysRegex;
+        }
+    }
+
+    var defaultWeekdaysShortRegex = matchWord;
+    function weekdaysShortRegex (isStrict) {
+        if (this._weekdaysParseExact) {
+            if (!hasOwnProp(this, '_weekdaysRegex')) {
+                computeWeekdaysParse.call(this);
+            }
+            if (isStrict) {
+                return this._weekdaysShortStrictRegex;
+            } else {
+                return this._weekdaysShortRegex;
+            }
+        } else {
+            return this._weekdaysShortStrictRegex && isStrict ?
+                this._weekdaysShortStrictRegex : this._weekdaysShortRegex;
+        }
+    }
+
+    var defaultWeekdaysMinRegex = matchWord;
+    function weekdaysMinRegex (isStrict) {
+        if (this._weekdaysParseExact) {
+            if (!hasOwnProp(this, '_weekdaysRegex')) {
+                computeWeekdaysParse.call(this);
+            }
+            if (isStrict) {
+                return this._weekdaysMinStrictRegex;
+            } else {
+                return this._weekdaysMinRegex;
+            }
+        } else {
+            return this._weekdaysMinStrictRegex && isStrict ?
+                this._weekdaysMinStrictRegex : this._weekdaysMinRegex;
+        }
+    }
+
+
+    function computeWeekdaysParse () {
+        function cmpLenRev(a, b) {
+            return b.length - a.length;
+        }
+
+        var minPieces = [], shortPieces = [], longPieces = [], mixedPieces = [],
+            i, mom, minp, shortp, longp;
+        for (i = 0; i < 7; i++) {
+            // make the regex if we don't have it already
+            mom = create_utc__createUTC([2000, 1]).day(i);
+            minp = this.weekdaysMin(mom, '');
+            shortp = this.weekdaysShort(mom, '');
+            longp = this.weekdays(mom, '');
+            minPieces.push(minp);
+            shortPieces.push(shortp);
+            longPieces.push(longp);
+            mixedPieces.push(minp);
+            mixedPieces.push(shortp);
+            mixedPieces.push(longp);
+        }
+        // Sorting makes sure if one weekday (or abbr) is a prefix of another it
+        // will match the longer piece.
+        minPieces.sort(cmpLenRev);
+        shortPieces.sort(cmpLenRev);
+        longPieces.sort(cmpLenRev);
+        mixedPieces.sort(cmpLenRev);
+        for (i = 0; i < 7; i++) {
+            shortPieces[i] = regexEscape(shortPieces[i]);
+            longPieces[i] = regexEscape(longPieces[i]);
+            mixedPieces[i] = regexEscape(mixedPieces[i]);
+        }
+
+        this._weekdaysRegex = new RegExp('^(' + mixedPieces.join('|') + ')', 'i');
+        this._weekdaysShortRegex = this._weekdaysRegex;
+        this._weekdaysMinRegex = this._weekdaysRegex;
+
+        this._weekdaysStrictRegex = new RegExp('^(' + longPieces.join('|') + ')', 'i');
+        this._weekdaysShortStrictRegex = new RegExp('^(' + shortPieces.join('|') + ')', 'i');
+        this._weekdaysMinStrictRegex = new RegExp('^(' + minPieces.join('|') + ')', 'i');
+    }
+
     // FORMATTING
 
     addFormatToken('DDD', ['DDDD', 3], 'DDDo', 'dayOfYear');
@@ -3016,8 +3312,13 @@ process.umask = function() { return 0; };
         return this.hours() % 12 || 12;
     }
 
+    function kFormat() {
+        return this.hours() || 24;
+    }
+
     addFormatToken('H', ['HH', 2], 0, 'hour');
     addFormatToken('h', ['hh', 2], 0, hFormat);
+    addFormatToken('k', ['kk', 2], 0, kFormat);
 
     addFormatToken('hmm', 0, 0, function () {
         return '' + hFormat.apply(this) + zeroFill(this.minutes(), 2);
@@ -3478,6 +3779,13 @@ process.umask = function() { return 0; };
     prototype__proto._weekdaysShort = defaultLocaleWeekdaysShort;
     prototype__proto.weekdaysParse  =        localeWeekdaysParse;
 
+    prototype__proto._weekdaysRegex      = defaultWeekdaysRegex;
+    prototype__proto.weekdaysRegex       =        weekdaysRegex;
+    prototype__proto._weekdaysShortRegex = defaultWeekdaysShortRegex;
+    prototype__proto.weekdaysShortRegex  =        weekdaysShortRegex;
+    prototype__proto._weekdaysMinRegex   = defaultWeekdaysMinRegex;
+    prototype__proto.weekdaysMinRegex    =        weekdaysMinRegex;
+
     // Hours
     prototype__proto.isPM = localeIsPM;
     prototype__proto._meridiemParse = defaultLocaleMeridiemParse;
@@ -3489,7 +3797,7 @@ process.umask = function() { return 0; };
         return locale[field](utc, format);
     }
 
-    function list (format, index, field, count, setter) {
+    function listMonthsImpl (format, index, field) {
         if (typeof format === 'number') {
             index = format;
             format = undefined;
@@ -3498,35 +3806,79 @@ process.umask = function() { return 0; };
         format = format || '';
 
         if (index != null) {
-            return lists__get(format, index, field, setter);
+            return lists__get(format, index, field, 'month');
         }
 
         var i;
         var out = [];
-        for (i = 0; i < count; i++) {
-            out[i] = lists__get(format, i, field, setter);
+        for (i = 0; i < 12; i++) {
+            out[i] = lists__get(format, i, field, 'month');
+        }
+        return out;
+    }
+
+    // ()
+    // (5)
+    // (fmt, 5)
+    // (fmt)
+    // (true)
+    // (true, 5)
+    // (true, fmt, 5)
+    // (true, fmt)
+    function listWeekdaysImpl (localeSorted, format, index, field) {
+        if (typeof localeSorted === 'boolean') {
+            if (typeof format === 'number') {
+                index = format;
+                format = undefined;
+            }
+
+            format = format || '';
+        } else {
+            format = localeSorted;
+            index = format;
+            localeSorted = false;
+
+            if (typeof format === 'number') {
+                index = format;
+                format = undefined;
+            }
+
+            format = format || '';
+        }
+
+        var locale = locale_locales__getLocale(),
+            shift = localeSorted ? locale._week.dow : 0;
+
+        if (index != null) {
+            return lists__get(format, (index + shift) % 7, field, 'day');
+        }
+
+        var i;
+        var out = [];
+        for (i = 0; i < 7; i++) {
+            out[i] = lists__get(format, (i + shift) % 7, field, 'day');
         }
         return out;
     }
 
     function lists__listMonths (format, index) {
-        return list(format, index, 'months', 12, 'month');
+        return listMonthsImpl(format, index, 'months');
     }
 
     function lists__listMonthsShort (format, index) {
-        return list(format, index, 'monthsShort', 12, 'month');
+        return listMonthsImpl(format, index, 'monthsShort');
     }
 
-    function lists__listWeekdays (format, index) {
-        return list(format, index, 'weekdays', 7, 'day');
+    function lists__listWeekdays (localeSorted, format, index) {
+        return listWeekdaysImpl(localeSorted, format, index, 'weekdays');
     }
 
-    function lists__listWeekdaysShort (format, index) {
-        return list(format, index, 'weekdaysShort', 7, 'day');
+    function lists__listWeekdaysShort (localeSorted, format, index) {
+        return listWeekdaysImpl(localeSorted, format, index, 'weekdaysShort');
     }
 
-    function lists__listWeekdaysMin (format, index) {
-        return list(format, index, 'weekdaysMin', 7, 'day');
+    function lists__listWeekdaysMin (localeSorted, format, index) {
+        return listWeekdaysImpl(localeSorted, format, index, 'weekdaysMin');
     }
 
     locale_locales__getSetGlobalLocale('en', {
@@ -3897,7 +4249,7 @@ process.umask = function() { return 0; };
     // Side effect imports
 
 
-    utils_hooks__hooks.version = '2.12.0';
+    utils_hooks__hooks.version = '2.13.0';
 
     setHookCallback(local__createLocal);
 
@@ -27772,6 +28124,86 @@ moment.locale('zh-tw');
 
 var classNames = require('classnames');
 
+var $i = {};
+$i['en'] = {
+  1: 'SimpleBudget',
+  2: 'Home',
+  3: 'Spend',
+  4: 'Reports',
+  5: 'Settings',
+  6: 'Price',
+  7: 'Spent!',
+  8: 'Spend',
+  9: 'Reports',
+  10: 'Category',
+  11: 'Total',
+  12: 'Date',
+  13: 'Price',
+  14: 'Are you sure you want to delete: ',
+  15: 'Do you really want to delete all your data?',
+  16: 'Are you sure you want to save to Dropbox?',
+  17: 'Are you sure you want to load from Dropbox to here?',
+  18: 'Are you sure you want to revoke access to Dropbox?',
+  19: 'Settings',
+  20: 'Spending Categories',
+  21: 'New Category',
+  22: 'Add',
+  23: 'Language',
+  24: 'Backup to Dropbox',
+  25: 'Manual Spending Entry',
+  26: 'Clear All Data',
+  27: 'Get Code',
+  28: 'Dropbox Code',
+  29: 'Link',
+  30: 'Last saved to Dropbox',
+  31: 'Never saved',
+  32: 'Save to Dropbox',
+  33: 'Show Advanced Options',
+  34: 'Hide',
+  35: 'These are advanced options you generally don\'t need to use.',
+  36: 'Restore from Dropbox',
+  37: 'Revoke Dropbox Access'
+};
+$i['zh-tw'] = {
+  1: 1,
+  2: 2,
+  3: 3,
+  4: 4,
+  5: 5,
+  6: 6,
+  7: 7,
+  8: 8,
+  9: 9,
+  10: 10,
+  11: 11,
+  12: 12,
+  13: 13,
+  14: 14,
+  15: 15,
+  16: 16,
+  17: 17,
+  18: 18,
+  19: 19,
+  20: 20,
+  21: 21,
+  22: 22,
+  23: 23,
+  24: 24,
+  25: 25,
+  26: 26,
+  27: 27,
+  28: 28,
+  29: 29,
+  30: 30,
+  31: 31,
+  32: 32,
+  33: 33,
+  34: 34,
+  35: 35,
+  36: 36,
+  37: 37
+};
+
 var NavBar = React.createClass({
   displayName: 'NavBar',
 
@@ -27800,7 +28232,8 @@ var NavBar = React.createClass({
           React.createElement(
             'a',
             { className: 'navbar-brand', href: '#' },
-            'SimpleBudget'
+            ' ',
+            $i[this.props.language][1]
           )
         ),
         React.createElement(
@@ -27815,7 +28248,7 @@ var NavBar = React.createClass({
               React.createElement(
                 'a',
                 { href: '#' },
-                'Home'
+                $i[this.props.language][2]
               )
             ),
             React.createElement(
@@ -27824,7 +28257,7 @@ var NavBar = React.createClass({
               React.createElement(
                 'a',
                 { href: '#/spend' },
-                'Spend'
+                $i[this.props.language][3]
               )
             ),
             React.createElement(
@@ -27833,7 +28266,7 @@ var NavBar = React.createClass({
               React.createElement(
                 'a',
                 { href: '#/reports' },
-                'Reports'
+                $i[this.props.language][4]
               )
             ),
             React.createElement(
@@ -27842,7 +28275,7 @@ var NavBar = React.createClass({
               React.createElement(
                 'a',
                 { href: '#/settings' },
-                'Settings'
+                $i[this.props.language][5]
               )
             )
           )
@@ -27919,7 +28352,7 @@ var Spend = React.createClass({
   },
 
   displayCat: function displayCat(key) {
-    return React.createElement(SpendCat, { key: key, category: key, index: this.state.categories.indexOf(key), spend: this.spend });
+    return React.createElement(SpendCat, { key: key, category: key, index: this.state.categories.indexOf(key), spend: this.spend, language: this.state.language });
   },
 
   spend: function spend(category, price) {
@@ -27958,14 +28391,14 @@ var Spend = React.createClass({
     return React.createElement(
       'div',
       null,
-      React.createElement(NavBar, { currentNav: 'spend' }),
+      React.createElement(NavBar, { currentNav: 'spend', language: this.state.language }),
       React.createElement(
         'div',
         { className: 'container' },
         React.createElement(
           'h1',
           null,
-          'Spend'
+          $i[this.state.language][8]
         ),
         React.createElement(
           'div',
@@ -28050,7 +28483,7 @@ var SpendCat = React.createClass({
                 React.createElement(
                   'div',
                   { className: inputClass },
-                  React.createElement('input', { type: 'tel', className: 'form-control', ref: 'price', placeholder: 'Price', onChange: this.handleChange })
+                  React.createElement('input', { type: 'tel', className: 'form-control', ref: 'price', placeholder: $i[this.props.language][6], onChange: this.handleChange })
                 )
               ),
               React.createElement(
@@ -28059,7 +28492,7 @@ var SpendCat = React.createClass({
                 React.createElement(
                   'button',
                   { type: 'submit', className: 'btn btn-default', disabled: !this.state.enableSubmit },
-                  'Spent!'
+                  $i[this.props.language][7]
                 )
               )
             )
@@ -28122,7 +28555,7 @@ var Reports = React.createClass({
 
   deleteMonthlyLog: function deleteMonthlyLog(key) {
     var toDelete = this.state.monthlyLog[this.state.showMonthId][key];
-    if (confirm('Are you sure you want to delete ' + toDelete.category + ' (' + toDelete.price + ')?')) {
+    if (confirm($i[this.state.language][14] + toDelete.category + ' (' + toDelete.price + ')?')) {
       this.state.monthlyTotals[this.state.showMonthId][toDelete.category] = parseInt(this.state.monthlyTotals[this.state.showMonthId][toDelete.category], 10) - parseInt(toDelete.price, 10);
       this.setState({ monthlyTotals: this.state.monthlyTotals });
       delete this.state.monthlyLog[this.state.showMonthId][key];
@@ -28217,14 +28650,14 @@ var Reports = React.createClass({
     return React.createElement(
       'div',
       null,
-      React.createElement(NavBar, { currentNav: 'reports' }),
+      React.createElement(NavBar, { currentNav: 'reports', language: this.state.language }),
       React.createElement(
         'div',
         { className: 'container' },
         React.createElement(
           'h1',
           null,
-          'Reports'
+          $i[this.state.language][9]
         ),
         React.createElement(
           'p',
@@ -28287,12 +28720,12 @@ var Reports = React.createClass({
               React.createElement(
                 'th',
                 null,
-                'Category'
+                $i[this.state.language][10]
               ),
               React.createElement(
                 'th',
                 { className: 'text-right' },
-                'Total'
+                $i[this.state.language][11]
               )
             )
           ),
@@ -28319,17 +28752,17 @@ var Reports = React.createClass({
               React.createElement(
                 'th',
                 { colSpan: '2' },
-                'Date'
+                $i[this.state.language][12]
               ),
               React.createElement(
                 'th',
                 null,
-                'Category'
+                $i[this.state.language][10]
               ),
               React.createElement(
                 'th',
                 { className: 'text-right' },
-                'Price'
+                $i[this.state.language][13]
               )
             )
           ),
@@ -28488,7 +28921,7 @@ var Settings = React.createClass({
   },
 
   clearData: function clearData(e) {
-    if (confirm('Do you really want to delete all your data?')) {
+    if (confirm($i[this.state.language][15])) {
       this.replaceState(this.getInitialState());
       localStorage.removeItem('sbudget');
     }
@@ -28525,7 +28958,7 @@ var Settings = React.createClass({
   },
 
   deleteCat: function deleteCat(key) {
-    if (confirm('Are you sure you want to delete: ' + key + '?')) {
+    if (confirm($i[this.state.language][14] + key + '?')) {
       this.state.categories.splice(this.state.categories.indexOf(key), 1);
       this.setState({ categories: this.state.categories });
     }
@@ -28546,7 +28979,7 @@ var Settings = React.createClass({
 
   dbSave: function dbSave(e) {
     e.preventDefault();
-    if (confirm('Are you sure you want to save the current data to Dropbox?')) {
+    if (confirm($i[this.state.language][16])) {
       {/* TODO: put this date into the success handler */}
       this.setState({ dbLastSaved: moment() });
       var dbToken = this.state.dbToken;
@@ -28571,7 +29004,7 @@ var Settings = React.createClass({
 
   dbRestore: function dbRestore(e) {
     e.preventDefault();
-    if (confirm('Are you sure you want to load data from Dropbox to here?')) {
+    if (confirm($i[this.state.language][17])) {
       var that = this;
       var dbToken = this.state.dbToken;
       var dbHeader = JSON.stringify({ "path": "/saveddata.txt" });
@@ -28597,7 +29030,7 @@ var Settings = React.createClass({
   dbRevoke: function dbRevoke(e) {
     e.preventDefault();
     var that = this;
-    if (confirm('Are you sure you want to revoke access to Dropbox?')) {
+    if (confirm($i[this.state.language][18])) {
       var dbToken = this.state.dbToken;
       $.ajax({
         type: 'POST',
@@ -28663,14 +29096,14 @@ var Settings = React.createClass({
     return React.createElement(
       'div',
       null,
-      React.createElement(NavBar, { currentNav: 'settings' }),
+      React.createElement(NavBar, { currentNav: 'settings', language: this.state.language }),
       React.createElement(
         'div',
         { className: 'container' },
         React.createElement(
           'h2',
           null,
-          'Settings'
+          $i[this.state.language][19]
         ),
         React.createElement(
           'div',
@@ -28681,7 +29114,7 @@ var Settings = React.createClass({
             React.createElement(
               'h3',
               { className: 'panel-title' },
-              'Spending Categories'
+              $i[this.state.language][20]
             )
           ),
           React.createElement(
@@ -28697,12 +29130,12 @@ var Settings = React.createClass({
                 React.createElement(
                   'div',
                   { className: 'form-group' },
-                  React.createElement('input', { type: 'text', className: 'form-control', ref: 'newcat', placeholder: 'New Category', onChange: this.enableBtnNewCat })
+                  React.createElement('input', { type: 'text', className: 'form-control', ref: 'newcat', placeholder: $i[this.state.language][21], onChange: this.enableBtnNewCat })
                 ),
                 React.createElement(
                   'button',
                   { type: 'submit', className: 'btn btn-default', disabled: this.state.newCatName.length === 0 },
-                  'Add'
+                  $i[this.state.language][22]
                 )
               )
             )
@@ -28722,7 +29155,7 @@ var Settings = React.createClass({
             React.createElement(
               'h3',
               { className: 'panel-title' },
-              'Language'
+              $i[this.state.language][23]
             )
           ),
           React.createElement(
@@ -28745,13 +29178,13 @@ var Settings = React.createClass({
             React.createElement(
               'h3',
               { className: 'panel-title' },
-              'Backup To Dropbox'
+              $i[this.state.language][24]
             )
           ),
           React.createElement(
             'div',
             { className: 'panel-body' },
-            this.state.dbToken ? React.createElement(DbLoggedIn, { dbSave: this.dbSave, dbRestore: this.dbRestore, dbRevoke: this.dbRevoke, dbLastSaved: this.state.dbLastSaved, dbShowAdv: this.state.dbShowAdv, dbShowAdvChange: this.dbShowAdvChange }) : React.createElement(DbLogin, { dbCode2Token: this.dbCode2Token })
+            this.state.dbToken ? React.createElement(DbLoggedIn, { language: this.state.language, dbSave: this.dbSave, dbRestore: this.dbRestore, dbRevoke: this.dbRevoke, dbLastSaved: this.state.dbLastSaved, dbShowAdv: this.state.dbShowAdv, dbShowAdvChange: this.dbShowAdvChange }) : React.createElement(DbLogin, { language: this.state.language, dbCode2Token: this.dbCode2Token })
           )
         ),
         React.createElement(
@@ -28768,7 +29201,7 @@ var Settings = React.createClass({
             React.createElement(
               'h3',
               { className: 'panel-title' },
-              'Manual Spending Entry'
+              $i[this.state.language][25]
             )
           ),
           React.createElement(
@@ -28794,12 +29227,12 @@ var Settings = React.createClass({
               React.createElement(
                 'div',
                 { className: 'form-group' },
-                React.createElement('input', { type: 'tel', className: 'form-control', ref: 'manualPrice', placeholder: 'Price' })
+                React.createElement('input', { type: 'tel', className: 'form-control', ref: 'manualPrice', placeholder: $i[this.state.language][6] })
               ),
               React.createElement(
                 'button',
                 { type: 'submit', className: 'btn btn-default' },
-                'Spend'
+                $i[this.state.language][7]
               )
             )
           )
@@ -28812,7 +29245,7 @@ var Settings = React.createClass({
         React.createElement(
           'button',
           { className: 'btn btn-danger btn-block', onClick: this.clearData },
-          'Clear All Data'
+          $i[this.state.language][26]
         )
       )
     );
@@ -28839,7 +29272,7 @@ var DbLogin = React.createClass({
       React.createElement(
         'button',
         { className: 'btn btn-primary btn-block', onClick: this.dbGetCode },
-        'Get Code'
+        $i[this.props.language][27]
       ),
       React.createElement(
         'p',
@@ -28852,12 +29285,12 @@ var DbLogin = React.createClass({
         React.createElement(
           'div',
           { className: 'form-group' },
-          React.createElement('input', { type: 'text', className: 'form-control', ref: 'dbCode', placeholder: 'Dropbox Code', size: '55' })
+          React.createElement('input', { type: 'text', className: 'form-control', ref: 'dbCode', placeholder: $i[this.props.language][28], size: '55' })
         ),
         React.createElement(
           'button',
           { type: 'submit', className: 'btn btn-default' },
-          'Link'
+          $i[this.props.language][29]
         )
       )
     );
@@ -28879,26 +29312,27 @@ var DbLoggedIn = React.createClass({
       React.createElement(
         'p',
         null,
-        'Last Saved To Dropbox: ',
-        this.props.dbLastSaved ? moment(this.props.dbLastSaved).calendar() : 'Never Saved'
+        $i[this.props.language][30],
+        ': ',
+        this.props.dbLastSaved ? moment(this.props.dbLastSaved).calendar() : $i[this.props.language][31]
       ),
       React.createElement(
         'button',
         { className: 'btn btn-default btn-block', onClick: this.props.dbSave },
-        'Save to Dropbox'
+        $i[this.props.language][32]
       ),
       React.createElement(
         'p',
         null,
         ' '
       ),
-      this.props.dbShowAdv ? React.createElement(DbLoggedInAdv, { dbRestore: this.props.dbRestore, dbRevoke: this.props.dbRevoke, dbShowAdvChange: this.props.dbShowAdvChange }) : React.createElement(
+      this.props.dbShowAdv ? React.createElement(DbLoggedInAdv, { language: this.props.language, dbRestore: this.props.dbRestore, dbRevoke: this.props.dbRevoke, dbShowAdvChange: this.props.dbShowAdvChange }) : React.createElement(
         'p',
         null,
         React.createElement(
           'a',
           { href: '#', onClick: this.showAdv },
-          'Show Advanced Options'
+          $i[this.props.language][33]
         )
       )
     );
@@ -28922,13 +29356,13 @@ var DbLoggedInAdv = React.createClass({
         React.createElement(
           'a',
           { href: '#', onClick: this.showAdv },
-          'Hide'
+          $i[this.props.language][34]
         )
       ),
       React.createElement(
         'p',
         null,
-        'These are advanced features that you generally don\'t need.'
+        $i[this.props.language][35]
       ),
       React.createElement(
         'p',
@@ -28938,7 +29372,7 @@ var DbLoggedInAdv = React.createClass({
       React.createElement(
         'button',
         { className: 'btn btn-default btn-block', onClick: this.props.dbRestore },
-        'Restore from Dropbox'
+        $i[this.props.language][36]
       ),
       React.createElement(
         'p',
@@ -28948,7 +29382,7 @@ var DbLoggedInAdv = React.createClass({
       React.createElement(
         'button',
         { className: 'btn btn-danger btn-block', onClick: this.props.dbRevoke },
-        'Revoke Dropbox Access'
+        $i[this.props.language][37]
       )
     );
   }

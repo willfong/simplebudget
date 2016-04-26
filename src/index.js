@@ -13,7 +13,6 @@ var HashHistory = ReactRouter.hashHistory;
 
 var moment = require('moment');
 
-
 // Because of a bug, cant use below
 // moment.locale('cs');
 
@@ -24,6 +23,126 @@ require('moment/locale/zh-tw');
 moment.locale('zh-tw');
 
 var classNames = require('classnames');
+
+
+var $i = {};
+$i['template_for_new_languages'] = {
+  1: 1,
+  2: 2,
+  3: 3,
+  4: 4,
+  5: 5,
+  6: 6,
+  7: 7,
+  8: 8,
+  9: 9,
+  10: 10,
+  11: 11,
+  12: 12,
+  13: 13,
+  14: 14,
+  15: 15,
+  16: 16,
+  17: 17,
+  18: 18,
+  19: 19,
+  20: 20,
+  21: 21,
+  22: 22,
+  23: 23,
+  24: 24,
+  25: 25,
+  26: 26,
+  27: 27,
+  28: 28,
+  29: 29,
+  30: 30,
+  31: 31,
+  32: 32,
+  33: 33,
+  34: 34,
+  35: 35,
+  36: 36,
+  37: 37
+};
+$i['en'] = {
+  1: 'SimpleBudget',
+  2: 'Home',
+  3: 'Spend',
+  4: 'Reports',
+  5: 'Settings',
+  6: 'Price',
+  7: 'Spent!',
+  8: 'Spend',
+  9: 'Reports',
+  10: 'Category',
+  11: 'Total',
+  12: 'Date',
+  13: 'Price',
+  14: 'Are you sure you want to delete: ',
+  15: 'Do you really want to delete all your data?',
+  16: 'Are you sure you want to save to Dropbox?',
+  17: 'Are you sure you want to load from Dropbox to here?',
+  18: 'Are you sure you want to revoke access to Dropbox?',
+  19: 'Settings',
+  20: 'Spending Categories',
+  21: 'New Category',
+  22: 'Add',
+  23: 'Language',
+  24: 'Backup to Dropbox',
+  25: 'Manual Spending Entry',
+  26: 'Clear All Data',
+  27: 'Get Code',
+  28: 'Dropbox Code',
+  29: 'Link',
+  30: 'Last saved to Dropbox',
+  31: 'Never saved',
+  32: 'Save to Dropbox',
+  33: 'Show Advanced Options',
+  34: 'Hide',
+  35: 'These are advanced options you generally don\'t need to use.',
+  36: 'Restore from Dropbox',
+  37: 'Revoke Dropbox Access'
+};
+$i['zh-tw'] = {
+  1: 1,
+  2: 2,
+  3: 3,
+  4: 4,
+  5: 5,
+  6: 6,
+  7: 7,
+  8: 8,
+  9: 9,
+  10: 10,
+  11: 11,
+  12: 12,
+  13: 13,
+  14: 14,
+  15: 15,
+  16: 16,
+  17: 17,
+  18: 18,
+  19: 19,
+  20: 20,
+  21: 21,
+  22: 22,
+  23: 23,
+  24: 24,
+  25: 25,
+  26: 26,
+  27: 27,
+  28: 28,
+  29: 29,
+  30: 30,
+  31: 31,
+  32: 32,
+  33: 33,
+  34: 34,
+  35: 35,
+  36: 36,
+  37: 37
+};
 
 
 var NavBar = React.createClass({
@@ -38,14 +157,14 @@ var NavBar = React.createClass({
         <span className="icon-bar"></span>
         <span className="icon-bar"></span>
       </button>
-      <a className="navbar-brand" href="#">SimpleBudget</a>
+      <a className="navbar-brand" href="#"> {$i[this.props.language][1]}</a>
     </div>
     <div id="navbar" className="navbar-collapse collapse">
       <ul className="nav navbar-nav">
-        <li className={(this.props.currentNav === "home") ? "active" : ""}><a href="#">Home</a></li>
-        <li className={(this.props.currentNav === "spend") ?  "active" : ""}><a href="#/spend">Spend</a></li>
-        <li className={(this.props.currentNav === "reports") ? "active" : ""}><a href="#/reports">Reports</a></li>
-        <li className={(this.props.currentNav === "settings") ? "active" : ""}><a href="#/settings">Settings</a></li>
+        <li className={(this.props.currentNav === "home") ? "active" : ""}><a href="#">{$i[this.props.language][2]}</a></li>
+        <li className={(this.props.currentNav === "spend") ?  "active" : ""}><a href="#/spend">{$i[this.props.language][3]}</a></li>
+        <li className={(this.props.currentNav === "reports") ? "active" : ""}><a href="#/reports">{$i[this.props.language][4]}</a></li>
+        <li className={(this.props.currentNav === "settings") ? "active" : ""}><a href="#/settings">{$i[this.props.language][5]}</a></li>
       </ul>
     </div>
   </div>
@@ -99,7 +218,7 @@ var Spend = React.createClass({
   },
     
   displayCat: function(key) {
-    return <SpendCat key={key} category={key} index={this.state.categories.indexOf(key)} spend={this.spend}/>;
+    return <SpendCat key={key} category={key} index={this.state.categories.indexOf(key)} spend={this.spend} language={this.state.language} />;
   },
   
   spend: function(category, price) {
@@ -138,9 +257,9 @@ var Spend = React.createClass({
   render: function() {
     return (
 <div>
-  <NavBar currentNav="spend"/>
+  <NavBar currentNav="spend" language={this.state.language} />
   <div className="container">
-    <h1>Spend</h1>
+    <h1>{$i[this.state.language][8]}</h1>
     <div className="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
       {this.state.categories.map(this.displayCat)}       
     </div>
@@ -203,11 +322,11 @@ var SpendCat = React.createClass({
         <div className="row">
           <div className="col-md-10 col-xs-8">
             <div className={inputClass}>
-                <input type="tel" className="form-control" ref="price" placeholder="Price" onChange={this.handleChange}/>
+                <input type="tel" className="form-control" ref="price" placeholder={$i[this.props.language][6]} onChange={this.handleChange}/>
             </div>
           </div> 
           <div className="col-md-2 col-xs-4">
-            <button type="submit" className="btn btn-default" disabled={!this.state.enableSubmit}>Spent!</button>
+            <button type="submit" className="btn btn-default" disabled={!this.state.enableSubmit}>{$i[this.props.language][7]}</button>
           </div>
         </div>
       </form>
@@ -270,7 +389,7 @@ var Reports = React.createClass({
 
   deleteMonthlyLog: function(key) {
     var toDelete = this.state.monthlyLog[this.state.showMonthId][key];
-    if (confirm('Are you sure you want to delete '+toDelete.category+' ('+toDelete.price+')?')) {
+    if (confirm($i[this.state.language][14] + toDelete.category+' ('+toDelete.price+')?')) {
       this.state.monthlyTotals[this.state.showMonthId][toDelete.category] = parseInt(this.state.monthlyTotals[this.state.showMonthId][toDelete.category], 10) - parseInt(toDelete.price, 10);
       this.setState({monthlyTotals: this.state.monthlyTotals});
       delete this.state.monthlyLog[this.state.showMonthId][key];
@@ -362,9 +481,9 @@ var Reports = React.createClass({
 
     return (
 <div>
-  <NavBar currentNav="reports" />
+  <NavBar currentNav="reports" language={this.state.language} />
   <div className="container">
-  <h1>Reports</h1>
+  <h1>{$i[this.state.language][9]}</h1>
   <p>&nbsp;</p>
   <div className="row">
     <div className="col-md-2 col-sm-2 col-xs-2 text-left"><h3><button className ="btn btn-default" onClick={this.prevMonth}><span className="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button></h3></div>
@@ -373,13 +492,13 @@ var Reports = React.createClass({
   </div>
   <p>&nbsp;</p>
   <table className="table">
-    <thead><tr><th>Category</th><th className="text-right">Total</th></tr></thead>
+    <thead><tr><th>{$i[this.state.language][10]}</th><th className="text-right">{$i[this.state.language][11]}</th></tr></thead>
     <tbody>{Object.keys(monthSummary).sort().map(this.displaySummary)}</tbody>
   </table>
 
   <p>&nbsp;</p>
   <table className="table">
-    <thead><tr><th colSpan="2">Date</th><th>Category</th><th className="text-right">Price</th></tr></thead>
+    <thead><tr><th colSpan="2">{$i[this.state.language][12]}</th><th>{$i[this.state.language][10]}</th><th className="text-right">{$i[this.state.language][13]}</th></tr></thead>
     <tbody>{logLines.map(this.displayLog)}</tbody>
   </table>
   <p><button className="btn btn-danger pull-right" onClick={this.toggleDelete}><span className="glyphicon glyphicon-trash" aria-hidden="true"></span></button></p>
@@ -469,7 +588,7 @@ var Settings = React.createClass({
   },
   
   clearData: function(e) {
-    if (confirm('Do you really want to delete all your data?')) {
+    if (confirm($i[this.state.language][15])) {
       this.replaceState(this.getInitialState());
       localStorage.removeItem('sbudget');
     }
@@ -496,7 +615,7 @@ var Settings = React.createClass({
   },
   
   deleteCat: function(key) {
-    if (confirm('Are you sure you want to delete: '+key+'?')) {
+    if (confirm($i[this.state.language][14] +key+'?')) {
       this.state.categories.splice(this.state.categories.indexOf(key), 1);
       this.setState({categories: this.state.categories});
     }
@@ -518,7 +637,7 @@ var Settings = React.createClass({
  
   dbSave: function(e) {
     e.preventDefault();
-    if (confirm('Are you sure you want to save the current data to Dropbox?')) {
+    if (confirm($i[this.state.language][16])) {
       {/* TODO: put this date into the success handler */}
       this.setState({dbLastSaved: moment()});
       var dbToken = this.state.dbToken;
@@ -539,7 +658,7 @@ var Settings = React.createClass({
  
   dbRestore: function(e) {
     e.preventDefault();
-    if (confirm('Are you sure you want to load data from Dropbox to here?')) {
+    if (confirm($i[this.state.language][17])) {
       var that = this;
       var dbToken = this.state.dbToken;
       var dbHeader = JSON.stringify({ "path": "/saveddata.txt" });
@@ -565,7 +684,7 @@ var Settings = React.createClass({
   dbRevoke: function(e) {
     e.preventDefault();
     var that = this;
-    if (confirm('Are you sure you want to revoke access to Dropbox?')) {
+    if (confirm($i[this.state.language][18])) {
       var dbToken = this.state.dbToken;
       $.ajax({
         type: 'POST',
@@ -632,19 +751,19 @@ var Settings = React.createClass({
   render: function() {
     return (
 <div>
-  <NavBar currentNav="settings" />
+  <NavBar currentNav="settings" language={this.state.language} />
   <div className="container">
-    <h2>Settings</h2>
+    <h2>{$i[this.state.language][19]}</h2>
     <div className="panel panel-default">
-      <div className="panel-heading"><h3 className="panel-title">Spending Categories</h3></div>
+      <div className="panel-heading"><h3 className="panel-title">{$i[this.state.language][20]}</h3></div>
       <ul className="list-group">
         {this.state.categories.map(this.displayCat)}
         <li className="list-group-item">
           <form className="form-inline" ref="newCatForm" onSubmit={this.createCat}>
             <div className="form-group">
-              <input type="text" className="form-control" ref="newcat" placeholder="New Category" onChange={this.enableBtnNewCat}/>
+              <input type="text" className="form-control" ref="newcat" placeholder={$i[this.state.language][21]} onChange={this.enableBtnNewCat}/>
             </div>
-            <button type="submit" className="btn btn-default" disabled={this.state.newCatName.length === 0}>Add</button>
+            <button type="submit" className="btn btn-default" disabled={this.state.newCatName.length === 0}>{$i[this.state.language][22]}</button>
           </form>
         </li>
       </ul>
@@ -652,7 +771,7 @@ var Settings = React.createClass({
     <p>&nbsp;</p>
     <div className="panel panel-default">
       <div className="panel-heading">
-        <h3 className="panel-title">Language</h3>
+        <h3 className="panel-title">{$i[this.state.language][23]}</h3>
       </div>
       <div className="panel-body">
         <LanguageOptions changeLanguage={this.changeLanguage} language={this.state.language} />
@@ -661,16 +780,16 @@ var Settings = React.createClass({
     <p>&nbsp;</p>
     <div className="panel panel-default">
       <div className="panel-heading">
-        <h3 className="panel-title">Backup To Dropbox</h3>
+        <h3 className="panel-title">{$i[this.state.language][24]}</h3>
       </div>
       <div className="panel-body">
-        { this.state.dbToken ? <DbLoggedIn dbSave={this.dbSave} dbRestore={this.dbRestore} dbRevoke={this.dbRevoke} dbLastSaved={this.state.dbLastSaved} dbShowAdv={this.state.dbShowAdv} dbShowAdvChange={this.dbShowAdvChange} /> : <DbLogin dbCode2Token={this.dbCode2Token} /> }
+        { this.state.dbToken ? <DbLoggedIn language={this.state.language} dbSave={this.dbSave} dbRestore={this.dbRestore} dbRevoke={this.dbRevoke} dbLastSaved={this.state.dbLastSaved} dbShowAdv={this.state.dbShowAdv} dbShowAdvChange={this.dbShowAdvChange} /> : <DbLogin language={this.state.language} dbCode2Token={this.dbCode2Token} /> }
       </div>
     </div>
     <p>&nbsp;</p>
     <div className="panel panel-default">
       <div className="panel-heading">
-        <h3 className="panel-title">Manual Spending Entry</h3>
+        <h3 className="panel-title">{$i[this.state.language][25]}</h3>
       </div>
       <div className="panel-body">
         <form className="form-inline" ref="manSpendForm" onSubmit={this.manualSpend}>
@@ -681,15 +800,15 @@ var Settings = React.createClass({
             <input type="date" className="form-control" ref="manualDate" />
           </div>
           <div className="form-group">
-            <input type="tel" className="form-control" ref="manualPrice" placeholder="Price" />
+            <input type="tel" className="form-control" ref="manualPrice" placeholder={$i[this.state.language][6]} />
           </div>
-          <button type="submit" className="btn btn-default">Spend</button>
+          <button type="submit" className="btn btn-default">{$i[this.state.language][7]}</button>
         </form>
       </div>
     </div>    
     <p>&nbsp;</p>
     
-    <button className="btn btn-danger btn-block" onClick={this.clearData}>Clear All Data</button>
+    <button className="btn btn-danger btn-block" onClick={this.clearData}>{$i[this.state.language][26]}</button>
   </div>
 </div>
     );
@@ -710,13 +829,13 @@ var DbLogin = React.createClass({
   render: function() {
     return (
       <div>
-        <button className="btn btn-primary btn-block" onClick={this.dbGetCode}>Get Code</button>
+        <button className="btn btn-primary btn-block" onClick={this.dbGetCode}>{$i[this.props.language][27]}</button>
         <p>&nbsp;</p>
         <form className="form-inline" ref="dbForm" onSubmit={this.dbCode2Token}>
           <div className="form-group">
-            <input type="text" className="form-control" ref="dbCode" placeholder="Dropbox Code" size="55"/>
+            <input type="text" className="form-control" ref="dbCode" placeholder={$i[this.props.language][28]} size="55"/>
           </div>
-          <button type="submit" className="btn btn-default">Link</button>
+          <button type="submit" className="btn btn-default">{$i[this.props.language][29]}</button>
         </form>
       </div>
     );
@@ -732,10 +851,10 @@ var DbLoggedIn = React.createClass({
   render: function() {
     return (
       <div>
-        <p>Last Saved To Dropbox: {this.props.dbLastSaved ? moment(this.props.dbLastSaved).calendar() : 'Never Saved'}</p>
-        <button className="btn btn-default btn-block" onClick={this.props.dbSave}>Save to Dropbox</button>
+        <p>{$i[this.props.language][30]}: {this.props.dbLastSaved ? moment(this.props.dbLastSaved).calendar() : $i[this.props.language][31]}</p>
+        <button className="btn btn-default btn-block" onClick={this.props.dbSave}>{$i[this.props.language][32]}</button>
         <p>&nbsp;</p>
-        {this.props.dbShowAdv ? <DbLoggedInAdv dbRestore={this.props.dbRestore} dbRevoke={this.props.dbRevoke} dbShowAdvChange={this.props.dbShowAdvChange} /> : <p><a href="#" onClick={this.showAdv}>Show Advanced Options</a></p> }
+        {this.props.dbShowAdv ? <DbLoggedInAdv language={this.props.language} dbRestore={this.props.dbRestore} dbRevoke={this.props.dbRevoke} dbShowAdvChange={this.props.dbShowAdvChange} /> : <p><a href="#" onClick={this.showAdv}>{$i[this.props.language][33]}</a></p> }
       </div>
     );
   }
@@ -749,12 +868,12 @@ var DbLoggedInAdv = React.createClass({
   render: function() {
     return (
       <div className="well well-lg">
-        <p><a href="#" onClick={this.showAdv}>Hide</a></p>
-        <p>These are advanced features that you generally don't need.</p>
+        <p><a href="#" onClick={this.showAdv}>{$i[this.props.language][34]}</a></p>
+        <p>{$i[this.props.language][35]}</p>
         <p>&nbsp;</p>
-        <button className="btn btn-default btn-block" onClick={this.props.dbRestore}>Restore from Dropbox</button>
+        <button className="btn btn-default btn-block" onClick={this.props.dbRestore}>{$i[this.props.language][36]}</button>
         <p>&nbsp;</p>
-        <button className="btn btn-danger btn-block" onClick={this.props.dbRevoke}>Revoke Dropbox Access</button>
+        <button className="btn btn-danger btn-block" onClick={this.props.dbRevoke}>{$i[this.props.language][37]}</button>
       </div>
     );
   }
