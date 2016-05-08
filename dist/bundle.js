@@ -28125,6 +28125,45 @@ moment.locale('zh-tw');
 var classNames = require('classnames');
 
 var $i = {};
+$i['template_for_new_languages'] = {
+  1: 1,
+  2: 2,
+  3: 3,
+  4: 4,
+  5: 5,
+  6: 6,
+  7: 7,
+  8: 8,
+  9: 9,
+  10: 10,
+  11: 11,
+  12: 12,
+  13: 13,
+  14: 14,
+  15: 15,
+  16: 16,
+  17: 17,
+  18: 18,
+  19: 19,
+  20: 20,
+  21: 21,
+  22: 22,
+  23: 23,
+  24: 24,
+  25: 25,
+  26: 26,
+  27: 27,
+  28: 28,
+  29: 29,
+  30: 30,
+  31: 31,
+  32: 32,
+  33: 33,
+  34: 34,
+  35: 35,
+  36: 36,
+  37: 37
+};
 $i['en'] = {
   1: 'SimpleBudget',
   2: 'Home',
@@ -28624,12 +28663,18 @@ var Reports = React.createClass({
       formattedMonth = moment(this.state.showMonthId + '01').format('MMMM YYYY');
     }
 
+    var dailyTotals = {};
     var logCopy = Object.keys(monthLog).sort().reverse().map(function (key, i) {
       var data = _this.state.monthlyLog[_this.state.showMonthId][key];
       var rawDate = new Date(parseInt(key, 10));
       var day = rawDate.getDate();
       data.fmtDay = day;
       data.key = key;
+      if (dailyTotals[day]) {
+        dailyTotals[day] += Number(data.price);
+      } else {
+        dailyTotals[day] = Number(data.price);
+      }
       return data;
     });
 
@@ -28637,8 +28682,9 @@ var Reports = React.createClass({
     var rowActive = false;
     var logLines = logCopy.map(function (row, i) {
       if (i == 0 || row.fmtDay != curDay) {
-        row.fmtDay = row.fmtDay;
         curDay = row.fmtDay;
+        {/* Use the line below to make display level changes */}
+        row.fmtDay = row.fmtDay;
         rowActive = !rowActive;
       } else {
         row.fmtDay = '';

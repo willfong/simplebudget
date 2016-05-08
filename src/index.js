@@ -456,12 +456,18 @@ var Reports = React.createClass({
       formattedMonth = moment(this.state.showMonthId + '01').format('MMMM YYYY');
     }
     
+    var dailyTotals = {};
     var logCopy = Object.keys(monthLog).sort().reverse().map((key,i) => {
       var data = this.state.monthlyLog[this.state.showMonthId][key];
       var rawDate = new Date(parseInt(key,10));
       var day = rawDate.getDate();
       data.fmtDay = day;
       data.key = key;
+      if (dailyTotals[day]) {
+        dailyTotals[day] += Number(data.price);
+      } else {
+        dailyTotals[day] = Number(data.price);
+      }
       return data;
     });
     
@@ -469,8 +475,9 @@ var Reports = React.createClass({
     var rowActive = false;
     var logLines = logCopy.map((row, i) => {
       if (i==0 || row.fmtDay != curDay ) {
-        row.fmtDay = row.fmtDay;
         curDay = row.fmtDay;
+        {/* Use the line below to make display level changes */}
+        row.fmtDay = row.fmtDay;
         rowActive = !rowActive;
       } else {
         row.fmtDay = '';
