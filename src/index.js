@@ -163,22 +163,22 @@ var NavBar = React.createClass({
 						</button>
 						<a className="navbar-brand" href="#">
 							{" "}
-							{$i[this.props.language][1]}
+							{$i["en"][1]}
 						</a>
 					</div>
 					<div id="navbar" className="navbar-collapse collapse">
 						<ul className="nav navbar-nav">
 							<li className={this.props.currentNav === "home" ? "active" : ""}>
-								<a href="#">{$i[this.props.language][2]}</a>
+								<a href="#">{$i["en"][2]}</a>
 							</li>
 							<li className={this.props.currentNav === "spend" ? "active" : ""}>
-								<a href="#/spend">{$i[this.props.language][3]}</a>
+								<a href="#/spend">{$i["en"][3]}</a>
 							</li>
 							<li className={this.props.currentNav === "reports" ? "active" : ""}>
-								<a href="#/reports">{$i[this.props.language][4]}</a>
+								<a href="#/reports">{$i["en"][4]}</a>
 							</li>
 							<li className={this.props.currentNav === "settings" ? "active" : ""}>
-								<a href="#/settings">{$i[this.props.language][5]}</a>
+								<a href="#/settings">{$i["en"][5]}</a>
 							</li>
 						</ul>
 					</div>
@@ -236,13 +236,7 @@ var Spend = React.createClass({
 
 	displayCat: function (key) {
 		return (
-			<SpendCat
-				key={key}
-				category={key}
-				index={this.state.categories.indexOf(key)}
-				spend={this.spend}
-				language={this.state.language}
-			/>
+			<SpendCat key={key} category={key} index={this.state.categories.indexOf(key)} spend={this.spend} language="en" />
 		);
 	},
 
@@ -284,9 +278,9 @@ var Spend = React.createClass({
 	render: function () {
 		return (
 			<div>
-				<NavBar currentNav="spend" language={this.state.language} />
+				<NavBar currentNav="spend" language="en" />
 				<div className="container">
-					<h1>{$i[this.state.language][8]}</h1>
+					<h1>{$i["en"][8]}</h1>
 					<div className="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 						{this.state.categories.map(this.displayCat)}
 					</div>
@@ -359,14 +353,14 @@ var SpendCat = React.createClass({
 											type="tel"
 											className="form-control"
 											ref="price"
-											placeholder={$i[this.props.language][6]}
+											placeholder={$i["en"][6]}
 											onChange={this.handleChange}
 										/>
 									</div>
 								</div>
 								<div className="col-md-2 col-xs-4">
 									<button type="submit" className="btn btn-default" disabled={!this.state.enableSubmit}>
-										{$i[this.props.language][7]}
+										{$i["en"][7]}
 									</button>
 								</div>
 							</div>
@@ -430,7 +424,7 @@ var Reports = React.createClass({
 
 	deleteMonthlyLog: function (key) {
 		var toDelete = this.state.monthlyLog[this.state.showMonthId][key];
-		if (confirm($i[this.state.language][14] + toDelete.category + " (" + toDelete.price + ")?")) {
+		if (confirm($i["en"][14] + toDelete.category + " (" + toDelete.price + ")?")) {
 			this.state.monthlyTotals[this.state.showMonthId][toDelete.category] =
 				parseInt(this.state.monthlyTotals[this.state.showMonthId][toDelete.category], 10) -
 				parseInt(toDelete.price, 10);
@@ -508,7 +502,7 @@ var Reports = React.createClass({
 		var monthLog = this.state.monthlyLog[this.state.showMonthId] || {};
 		var monthSummary = this.state.monthlyTotals[this.state.showMonthId] || {};
 		var formattedMonth;
-		if (this.state.language == "zh-tw") {
+		if ("en" == "zh-tw") {
 			formattedMonth =
 				"民國" +
 				moment(this.state.showMonthId + "01")
@@ -555,9 +549,9 @@ var Reports = React.createClass({
 
 		return (
 			<div>
-				<NavBar currentNav="reports" language={this.state.language} />
+				<NavBar currentNav="reports" language="en" />
 				<div className="container">
-					<h1>{$i[this.state.language][9]}</h1>
+					<h1>{$i["en"][9]}</h1>
 					<p>&nbsp;</p>
 					<div className="row">
 						<div className="col-md-2 col-sm-2 col-xs-2 text-left">
@@ -582,8 +576,8 @@ var Reports = React.createClass({
 					<table className="table">
 						<thead>
 							<tr>
-								<th>{$i[this.state.language][10]}</th>
-								<th className="text-right">{$i[this.state.language][11]}</th>
+								<th>{$i["en"][10]}</th>
+								<th className="text-right">{$i["en"][11]}</th>
 							</tr>
 						</thead>
 						<tbody>{Object.keys(monthSummary).sort().map(this.displaySummary)}</tbody>
@@ -593,9 +587,9 @@ var Reports = React.createClass({
 					<table className="table">
 						<thead>
 							<tr>
-								<th colSpan="2">{$i[this.state.language][12]}</th>
-								<th>{$i[this.state.language][10]}</th>
-								<th className="text-right">{$i[this.state.language][13]}</th>
+								<th colSpan="2">{$i["en"][12]}</th>
+								<th>{$i["en"][10]}</th>
+								<th className="text-right">{$i["en"][13]}</th>
 							</tr>
 						</thead>
 						<tbody>{logLines.map(this.displayLog)}</tbody>
@@ -655,7 +649,7 @@ var LanguageOptions = React.createClass({
 	},
 	render: function () {
 		return (
-			<select className="form-control" ref="languageSelect" onChange={this.handleChange} value={this.props.language}>
+			<select className="form-control" ref="languageSelect" onChange={this.handleChange} value={"en"}>
 				<option value="en">English</option>
 				<option value="zh-tw">繁體中文</option>
 			</select>
@@ -683,7 +677,7 @@ var Settings = React.createClass({
 			this.state = JSON.parse(lsRef);
 			this.state.newCatName = "";
 			this.forceUpdate();
-			switch (this.state.language) {
+			switch ("en") {
 				case "en":
 					moment.locale("en");
 					break;
@@ -701,11 +695,11 @@ var Settings = React.createClass({
 
 	changeLanguage: function (lang) {
 		this.state.language = lang;
-		this.setState({ language: this.state.language });
+		this.setState({ language: "en" });
 	},
 
 	clearData: function (e) {
-		if (confirm($i[this.state.language][15])) {
+		if (confirm($i["en"][15])) {
 			this.replaceState(this.getInitialState());
 			localStorage.removeItem("sbudget");
 		}
@@ -735,7 +729,7 @@ var Settings = React.createClass({
 	},
 
 	deleteCat: function (key) {
-		if (confirm($i[this.state.language][14] + key + "?")) {
+		if (confirm($i["en"][14] + key + "?")) {
 			this.state.categories.splice(this.state.categories.indexOf(key), 1);
 			this.setState({ categories: this.state.categories });
 		}
@@ -771,7 +765,7 @@ var Settings = React.createClass({
 
 	dbSave: function (e) {
 		e.preventDefault();
-		if (confirm($i[this.state.language][16])) {
+		if (confirm($i["en"][16])) {
 			{
 				/* TODO: put this date into the success handler */
 			}
@@ -800,7 +794,7 @@ var Settings = React.createClass({
 
 	dbRestore: function (e) {
 		e.preventDefault();
-		if (confirm($i[this.state.language][17])) {
+		if (confirm($i["en"][17])) {
 			var that = this;
 			var dbToken = this.state.dbToken;
 			var dbHeader = JSON.stringify({ path: "/saveddata.txt" });
@@ -830,7 +824,7 @@ var Settings = React.createClass({
 	dbRevoke: function (e) {
 		e.preventDefault();
 		var that = this;
-		if (confirm($i[this.state.language][18])) {
+		if (confirm($i["en"][18])) {
 			var dbToken = this.state.dbToken;
 			$.ajax({
 				type: "POST",
@@ -896,12 +890,12 @@ var Settings = React.createClass({
 	render: function () {
 		return (
 			<div>
-				<NavBar currentNav="settings" language={this.state.language} />
+				<NavBar currentNav="settings" language="en" />
 				<div className="container">
-					<h2>{$i[this.state.language][19]}</h2>
+					<h2>{$i["en"][19]}</h2>
 					<div className="panel panel-default">
 						<div className="panel-heading">
-							<h3 className="panel-title">{$i[this.state.language][20]}</h3>
+							<h3 className="panel-title">{$i["en"][20]}</h3>
 						</div>
 						<ul className="list-group">
 							{this.state.categories.map(this.displayCat)}
@@ -912,12 +906,12 @@ var Settings = React.createClass({
 											type="text"
 											className="form-control"
 											ref="newcat"
-											placeholder={$i[this.state.language][21]}
+											placeholder={$i["en"][21]}
 											onChange={this.enableBtnNewCat}
 										/>
 									</div>
 									<button type="submit" className="btn btn-default" disabled={this.state.newCatName.length === 0}>
-										{$i[this.state.language][22]}
+										{$i["en"][22]}
 									</button>
 								</form>
 							</li>
@@ -926,21 +920,21 @@ var Settings = React.createClass({
 					<p>&nbsp;</p>
 					<div className="panel panel-default">
 						<div className="panel-heading">
-							<h3 className="panel-title">{$i[this.state.language][23]}</h3>
+							<h3 className="panel-title">{$i["en"][23]}</h3>
 						</div>
 						<div className="panel-body">
-							<LanguageOptions changeLanguage={this.changeLanguage} language={this.state.language} />
+							<LanguageOptions changeLanguage="en" language="en" />
 						</div>
 					</div>
 					<p>&nbsp;</p>
 					<div className="panel panel-default">
 						<div className="panel-heading">
-							<h3 className="panel-title">{$i[this.state.language][24]}</h3>
+							<h3 className="panel-title">{$i["en"][24]}</h3>
 						</div>
 						<div className="panel-body">
 							{this.state.dbToken ? (
 								<DbLoggedIn
-									language={this.state.language}
+									language="en"
 									dbSave={this.dbSave}
 									dbRestore={this.dbRestore}
 									dbRevoke={this.dbRevoke}
@@ -949,14 +943,14 @@ var Settings = React.createClass({
 									dbShowAdvChange={this.dbShowAdvChange}
 								/>
 							) : (
-								<DbLogin language={this.state.language} dbCode2Token={this.dbCode2Token} />
+								<DbLogin language="en" dbCode2Token={this.dbCode2Token} />
 							)}
 						</div>
 					</div>
 					<p>&nbsp;</p>
 					<div className="panel panel-default">
 						<div className="panel-heading">
-							<h3 className="panel-title">{$i[this.state.language][25]}</h3>
+							<h3 className="panel-title">{$i["en"][25]}</h3>
 						</div>
 						<div className="panel-body">
 							<form className="form-inline" ref="manSpendForm" onSubmit={this.manualSpend}>
@@ -969,15 +963,10 @@ var Settings = React.createClass({
 									<input type="date" className="form-control" ref="manualDate" />
 								</div>
 								<div className="form-group">
-									<input
-										type="tel"
-										className="form-control"
-										ref="manualPrice"
-										placeholder={$i[this.state.language][6]}
-									/>
+									<input type="tel" className="form-control" ref="manualPrice" placeholder={$i["en"][6]} />
 								</div>
 								<button type="submit" className="btn btn-default">
-									{$i[this.state.language][7]}
+									{$i["en"][7]}
 								</button>
 							</form>
 						</div>
@@ -985,7 +974,7 @@ var Settings = React.createClass({
 					<p>&nbsp;</p>
 
 					<button className="btn btn-danger btn-block" onClick={this.clearData}>
-						{$i[this.state.language][26]}
+						{$i["en"][26]}
 					</button>
 				</div>
 			</div>
@@ -1011,21 +1000,15 @@ var DbLogin = React.createClass({
 		return (
 			<div>
 				<button className="btn btn-primary btn-block" onClick={this.dbGetCode}>
-					{$i[this.props.language][27]}
+					{$i["en"][27]}
 				</button>
 				<p>&nbsp;</p>
 				<form className="form-inline" ref="dbForm" onSubmit={this.dbCode2Token}>
 					<div className="form-group">
-						<input
-							type="text"
-							className="form-control"
-							ref="dbCode"
-							placeholder={$i[this.props.language][28]}
-							size="55"
-						/>
+						<input type="text" className="form-control" ref="dbCode" placeholder={$i["en"][28]} size="55" />
 					</div>
 					<button type="submit" className="btn btn-default">
-						{$i[this.props.language][29]}
+						{$i["en"][29]}
 					</button>
 				</form>
 			</div>
@@ -1043,16 +1026,15 @@ var DbLoggedIn = React.createClass({
 		return (
 			<div>
 				<p>
-					{$i[this.props.language][30]}:{" "}
-					{this.props.dbLastSaved ? moment(this.props.dbLastSaved).calendar() : $i[this.props.language][31]}
+					{$i["en"][30]}: {this.props.dbLastSaved ? moment(this.props.dbLastSaved).calendar() : $i["en"][31]}
 				</p>
 				<button className="btn btn-default btn-block" onClick={this.props.dbSave}>
-					{$i[this.props.language][32]}
+					{$i["en"][32]}
 				</button>
 				<p>&nbsp;</p>
 				{this.props.dbShowAdv ? (
 					<DbLoggedInAdv
-						language={this.props.language}
+						language="en"
 						dbRestore={this.props.dbRestore}
 						dbRevoke={this.props.dbRevoke}
 						dbShowAdvChange={this.props.dbShowAdvChange}
@@ -1060,7 +1042,7 @@ var DbLoggedIn = React.createClass({
 				) : (
 					<p>
 						<a href="#" onClick={this.showAdv}>
-							{$i[this.props.language][33]}
+							{$i["en"][33]}
 						</a>
 					</p>
 				)}
@@ -1079,17 +1061,17 @@ var DbLoggedInAdv = React.createClass({
 			<div className="well well-lg">
 				<p>
 					<a href="#" onClick={this.showAdv}>
-						{$i[this.props.language][34]}
+						{$i["en"][34]}
 					</a>
 				</p>
-				<p>{$i[this.props.language][35]}</p>
+				<p>{$i["en"][35]}</p>
 				<p>&nbsp;</p>
 				<button className="btn btn-default btn-block" onClick={this.props.dbRestore}>
-					{$i[this.props.language][36]}
+					{$i["en"][36]}
 				</button>
 				<p>&nbsp;</p>
 				<button className="btn btn-danger btn-block" onClick={this.props.dbRevoke}>
-					{$i[this.props.language][37]}
+					{$i["en"][37]}
 				</button>
 			</div>
 		);
